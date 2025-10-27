@@ -78,16 +78,16 @@ class Breakpoints {
     this.largeDesktopColumns = 7,
     this.extraLargeDesktopColumns = 8,
   }) : assert(
-         smallMobileColumns > 0 &&
-             mobileColumns > 0 &&
-             smallTabletColumns > 0 &&
-             tabletColumns > 0 &&
-             laptopColumns > 0 &&
-             desktopColumns > 0 &&
-             largeDesktopColumns > 0 &&
-             extraLargeDesktopColumns > 0,
-         'Column counts must all be greater than zero',
-       );
+          smallMobileColumns > 0 &&
+              mobileColumns > 0 &&
+              smallTabletColumns > 0 &&
+              tabletColumns > 0 &&
+              laptopColumns > 0 &&
+              desktopColumns > 0 &&
+              largeDesktopColumns > 0 &&
+              extraLargeDesktopColumns > 0,
+          'Column counts must all be greater than zero',
+        );
 
   /// Creates a copy of this [Breakpoints] with the given fields replaced
   /// with new values.
@@ -117,22 +117,23 @@ class Breakpoints {
     int? laptopColumns,
     int? desktopColumns,
     int? largeDesktopColumns,
-  }) => Breakpoints(
-    smallMobile: smallMobile ?? this.smallMobile,
-    mobile: mobile ?? this.mobile,
-    smallTablet: smallTablet ?? this.smallTablet,
-    tablet: tablet ?? this.tablet,
-    laptop: laptop ?? this.laptop,
-    desktop: desktop ?? this.desktop,
-    largeDesktop: largeDesktop ?? this.largeDesktop,
-    smallMobileColumns: smallMobileColumns ?? this.smallMobileColumns,
-    mobileColumns: mobileColumns ?? this.mobileColumns,
-    smallTabletColumns: smallTabletColumns ?? this.smallTabletColumns,
-    tabletColumns: tabletColumns ?? this.tabletColumns,
-    laptopColumns: laptopColumns ?? this.laptopColumns,
-    desktopColumns: desktopColumns ?? this.desktopColumns,
-    largeDesktopColumns: largeDesktopColumns ?? this.largeDesktopColumns,
-  );
+  }) =>
+      Breakpoints(
+        smallMobile: smallMobile ?? this.smallMobile,
+        mobile: mobile ?? this.mobile,
+        smallTablet: smallTablet ?? this.smallTablet,
+        tablet: tablet ?? this.tablet,
+        laptop: laptop ?? this.laptop,
+        desktop: desktop ?? this.desktop,
+        largeDesktop: largeDesktop ?? this.largeDesktop,
+        smallMobileColumns: smallMobileColumns ?? this.smallMobileColumns,
+        mobileColumns: mobileColumns ?? this.mobileColumns,
+        smallTabletColumns: smallTabletColumns ?? this.smallTabletColumns,
+        tabletColumns: tabletColumns ?? this.tabletColumns,
+        laptopColumns: laptopColumns ?? this.laptopColumns,
+        desktopColumns: desktopColumns ?? this.desktopColumns,
+        largeDesktopColumns: largeDesktopColumns ?? this.largeDesktopColumns,
+      );
 
   /// Merges this breakpoints configuration with another, using the other's
   /// non-null values to override this one's values.
@@ -178,24 +179,25 @@ class Breakpoints {
     int? largeDesktopColumns,
     double? extraLargeDesktop,
     int? extraLargeDesktopColumns,
-  }) => Breakpoints(
-    smallMobile: smallMobile,
-    smallMobileColumns: smallMobileColumns ?? 1,
-    mobile: mobile,
-    mobileColumns: mobileColumns ?? 1,
-    smallTablet: smallTablet,
-    smallTabletColumns: smallTabletColumns ?? 1,
-    tablet: tablet,
-    tabletColumns: tabletColumns ?? 1,
-    laptop: laptop,
-    laptopColumns: laptopColumns ?? 1,
-    desktop: desktop,
-    desktopColumns: desktopColumns ?? 1,
-    largeDesktop: largeDesktop,
-    largeDesktopColumns: largeDesktopColumns ?? 1,
-    extraLargeDesktop: extraLargeDesktop,
-    extraLargeDesktopColumns: extraLargeDesktopColumns ?? 1,
-  );
+  }) =>
+      Breakpoints(
+        smallMobile: smallMobile,
+        smallMobileColumns: smallMobileColumns ?? 1,
+        mobile: mobile,
+        mobileColumns: mobileColumns ?? 1,
+        smallTablet: smallTablet,
+        smallTabletColumns: smallTabletColumns ?? 1,
+        tablet: tablet,
+        tabletColumns: tabletColumns ?? 1,
+        laptop: laptop,
+        laptopColumns: laptopColumns ?? 1,
+        desktop: desktop,
+        desktopColumns: desktopColumns ?? 1,
+        largeDesktop: largeDesktop,
+        largeDesktopColumns: largeDesktopColumns ?? 1,
+        extraLargeDesktop: extraLargeDesktop,
+        extraLargeDesktopColumns: extraLargeDesktopColumns ?? 1,
+      );
 
   @override
   String toString() {
