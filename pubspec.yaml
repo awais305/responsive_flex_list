@@ -1,0 +1,26 @@
+name: responsive_flex_list
+description: A Flutter package for creating animated responsive list to grid layouts with masonry support, customizable separators, and full RTL compatibility.
+version: 0.1.0
+homepage: https://github.com/awais305/responsive_flex_list
+repository: https://github.com/awais305/responsive_flex_list
+issue_tracker: https://github.com/awais305/responsive_flex_list/issues
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+topics:
+  - responsive
+  - masonry
+  - pinterest
+  - separator
+  - grid
