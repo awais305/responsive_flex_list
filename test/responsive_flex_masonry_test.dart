@@ -107,7 +107,7 @@ void main() {
           home: ResponsiveFlexMasonry.pinterest(
             items: const [1, 2, 3, 4],
             itemBuilder: (item, index) => SizedBox(
-              height: 100.0 * item!, // Varying heights for masonry
+              height: 100.0 * item, // Varying heights for masonry
               child: Text('Item $item'),
             ),
           ),
@@ -157,7 +157,7 @@ void main() {
             items: imagesWithCaptions,
             itemBuilder: (item, index) => Column(
               children: [
-                if (item!['url'] != null)
+                if (item['url'] != null)
                   Image.network(
                     item['url']!,
                     fit: BoxFit.fitWidth,

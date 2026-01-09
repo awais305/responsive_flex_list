@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:responsive_flex_list/src/core/core.dart';
 
 /// Default animation duration for ResponsiveFlexList animations
-const Duration kDefaultAnimationDuration = Duration(milliseconds: 400);
+const Duration kDefaultAnimationDuration = Duration(milliseconds: 250);
 
 /// Default stagger delay between item animations
-const Duration kDefaultStaggerDelay = Duration(milliseconds: 300);
+const Duration kDefaultStaggerDelay = Duration(milliseconds: 100);
 
 /// Default maximum number of items to animate
 const int kDefaultMaxStaggeredItems = 20;

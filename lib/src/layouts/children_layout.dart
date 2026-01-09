@@ -53,10 +53,6 @@ class ChildrenLayout<T> extends BaseResponsiveLayout<T> {
 
   @override
   Widget buildLayout(BuildContext context) {
-    if (children.isEmpty) {
-      return const FlexEmptyState();
-    }
-
     return CustomScrollView(
       key: listKey,
       shrinkWrap: shrinkWrap,

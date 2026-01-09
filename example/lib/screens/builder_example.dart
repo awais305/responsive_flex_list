@@ -31,10 +31,8 @@ class BuilderExample extends StatelessWidget {
                 staggerDelay: Duration(milliseconds: 300),
                 animationType: ResponsiveAnimationType.slideDown,
                 items: fruits,
-                itemBuilder: (fruit, index) {
-                  if (fruit == null) return const SizedBox.shrink();
-
-                  return _buildCard(fruit, index);
+                itemBuilder: (context, index) {
+                  return _buildCard(fruits[index], index);
                 },
               ),
             ),

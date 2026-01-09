@@ -1,14 +1,13 @@
 import 'package:example/screens/masonry_example.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:responsive_flex_list/responsive_flex_list.dart';
 
 import 'screens/builder_example.dart';
 import 'screens/children_example.dart';
 import 'screens/separator_example.dart';
+import 'screens/test.dart';
 
 void main() {
-  ResponsiveConfig.init(breakpoints: Breakpoints.defaultBreakpoints);
   runApp(const MyApp());
 
   // debugProfileBuildsEnabled = true;
@@ -50,6 +49,83 @@ class MyAppState extends State<MyApp> {
       title: 'ResponsiveFlexList Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const ResponsiveFlexListDemo(),
+      // home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: GroupedListView<TransactionModel>(
+        items: transactions,
+        groupBy: (transaction) {
+          return '${transaction.date.month} ${transaction.date.year}';
+        },
+        subGroupBy: (transaction) {
+          return '${transaction.date.year}/${transaction.date.month}/${transaction.date.day}';
+        },
+        firstGroupLabel: 'This Month',
+        groupHeaderBuilder: (groupKey, items) {
+          final total = items.fold(
+            0.0,
+            (sum, t) => sum + double.parse(t.amount),
+          );
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  groupKey,
+                  style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  '\$${total.toStringAsFixed(2)}',
+                  style: TextStyle(fontSize: 23),
+                ),
+              ],
+            ),
+          );
+        },
+        subGroupHeaderBuilder: (subGroupKey, items) {
+          final dailyTotal = items.fold(
+            0.0,
+            (sum, t) => sum + double.parse(t.amount),
+          );
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  subGroupKey,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (items.length > 1)
+                  Text(
+                    '\$${dailyTotal.toStringAsFixed(2)}',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+              ],
+            ),
+          );
+        },
+        itemBuilder: (transaction, itemsInSubGroup) {
+          return ListTile(
+            title: Text(transaction.title),
+            subtitle: Text(transaction.description),
+            trailing: Text('\$${transaction.amount}'),
+          );
+        },
+      ),
     );
   }
 }

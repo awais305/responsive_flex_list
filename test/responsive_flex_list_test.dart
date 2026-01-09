@@ -337,7 +337,7 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: items,
-              itemBuilder: (item, index) => Text(item!),
+              itemBuilder: (item, index) => Text(item),
             ),
           ),
         );
@@ -384,7 +384,7 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: const ['Single'],
-              itemBuilder: (item, index) => Text(item!),
+              itemBuilder: (item, index) => Text(item),
             ),
           ),
         );
@@ -401,7 +401,7 @@ void main() {
               items: items,
               itemBuilder: (item, index) => SizedBox(
                 height: 100,
-                child: Text(item!),
+                child: Text(item),
               ),
             ),
           ),
@@ -507,7 +507,7 @@ void main() {
             home: ResponsiveFlexList.builder(
               items: items,
               itemBuilder: (item, index) =>
-                  Text('${item!['name']} - ${item['age']}'),
+                  Text('${item['name']} - ${item['age']}'),
             ),
           ),
         );
@@ -527,7 +527,7 @@ void main() {
             home: ResponsiveFlexList.builder(
               items: items,
               itemBuilder: (item, index) =>
-                  Text('${item!['name']}: \$${item['price']}'),
+                  Text('${item['name']}: \$${item['price']}'),
             ),
           ),
         );
@@ -688,7 +688,7 @@ void main() {
             home: ResponsiveFlexList.withSeparators(
               items: const [1, 2, 3],
               itemBuilder: (item, index) => SizedBox(
-                height: item! * 50.0,
+                height: item * 50.0,
                 child: Text('Item $item'),
               ),
               mainAxisSeparator: (index, total) => const Divider(),

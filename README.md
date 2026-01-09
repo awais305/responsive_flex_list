@@ -36,20 +36,17 @@ flutter pub get
 
 ## Getting Started
 
-Initialize the package with your breakpoints before use:
+Initialize the package with your custom breakpoints before use (optional):
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:responsive_flex_list/responsive_flex_list.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize breakpoints before using ResponsiveFlexList (required)
-  ResponsiveConfig.init(
-    breakpoints: Breakpoints.defaultBreakpoints,
-    // Or customize: Breakpoints.onlyWith(...) or Breakpoints(...)
-  );
+  // Optional: Initialize custom breakpoints
+  // ResponsiveConfig.init(
+  //   breakpoints: Breakpoints.defaultBreakpoints,
+  // );
 
   runApp(const MyApp());
 }
@@ -313,7 +310,7 @@ ResponsiveFlexList.withSeparators(
 | `isDesktopDevice`     | General desktop check                        | ≥ 1024px                  |
 | `hasMediaQuery`       | Checks if MediaQuery is available in context | `true` inside widget tree |
 
-> **Note:** Context extensions use breakpoints from `ResponsiveConfig`. Undefined breakpoints return `false`.
+> **Note:** Context extensions use breakpoints from `ResponsiveConfig`. If not initialized, they use `Breakpoints.defaultBreakpoints`.
 
 ## Contributing
 

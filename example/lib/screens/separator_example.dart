@@ -169,7 +169,7 @@ class _SeparatorExampleState extends State<SeparatorExample> {
                         child: Column(
                           children: [
                             Text(
-                              '${index + 1}. ${item!['title']}',
+                              '${index + 1}. ${item['title']}',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(item['body'], textAlign: TextAlign.justify),

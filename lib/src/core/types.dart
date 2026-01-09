@@ -3,11 +3,11 @@ import 'package:flutter/widgets.dart';
 /// Typedef for item builders
 ///
 /// Item builders receive:
-/// - [item]: The data item (nullable)
+/// - [item]: The data item
 /// - [index]: The position of the item in the list
 ///
 /// Should return the widget to display
-typedef ItemBuilder<T> = Widget Function(T? item, int index);
+typedef ItemBuilder<T> = Widget Function(T item, int index);
 
 typedef SeparatorBuilder = Widget Function(int index, int total);
 
