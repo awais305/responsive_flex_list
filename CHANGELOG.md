@@ -1,3 +1,8 @@
+## [1.0.1] - 10 Jan 2026
+
+- Updated README with clearer usage instructions
+- Improved example app to demonstrate correct package usage
+
 ## [1.0.0] - 09 Jan 2026
 
 - **Breaking Change**: Updated `ItemBuilder<T>` signature to use non-nullable `T`. Users may need to remove null checks or explicit `?` from their item builder functions.
