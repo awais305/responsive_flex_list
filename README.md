@@ -45,7 +45,7 @@ import 'package:responsive_flex_list/responsive_flex_list.dart';
 void main() {
   // Optional: Initialize custom breakpoints
   // ResponsiveConfig.init(
-  //   breakpoints: Breakpoints.defaultBreakpoints,
+  //  breakpoints: Breakpoints.defaultBreakpoints or Breakpoints.onlyWith(...) or Breakpoints(...)
   // );
 
   runApp(const MyApp());
