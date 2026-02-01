@@ -60,13 +60,13 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       textDirection: getTextDirection(),
-                      children: _buildAllColumns(),
+                      children: _buildAllColumns(context),
                     ),
                   )
                 : Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     textDirection: getTextDirection(),
-                    children: _buildAllColumns(),
+                    children: _buildAllColumns(context),
                   ),
           ),
         ),
@@ -75,13 +75,13 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
   }
 
   /// Builds all columns with items distributed in round-robin fashion.
-  List<Widget> _buildAllColumns() {
+  List<Widget> _buildAllColumns(BuildContext context) {
     if (items.isEmpty) return [];
 
     final List<Widget> columns = [];
 
     for (int columnIndex = 0; columnIndex < crossAxisCount; columnIndex++) {
-      final Widget column = _buildSingleColumn(columnIndex);
+      final Widget column = _buildSingleColumn(context, columnIndex);
       columns.add(Expanded(child: column));
 
       // Add vertical separator between columns
@@ -108,7 +108,7 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
   }
 
   /// Builds a single column with its assigned items from the round-robin distribution.
-  Widget _buildSingleColumn(int columnIndex) {
+  Widget _buildSingleColumn(BuildContext context, int columnIndex) {
     List<T> columnItems = [];
     List<int> globalIndices = [];
 
@@ -144,7 +144,7 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
           animationIndex: animationIndex,
           child: item == null
               ? const SizedBox.shrink()
-              : itemBuilder!(item, globalIndex),
+              : itemBuilder!(context, globalIndex),
         ),
       );
 

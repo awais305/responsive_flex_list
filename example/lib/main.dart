@@ -23,11 +23,7 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en', 'US');
 
-  void setLocale(Locale locale) {
-    setState(() {
-      _locale = locale;
-    });
-  }
+  void setLocale(Locale locale) => setState(() => _locale = locale);
 
   @override
   Widget build(BuildContext context) {

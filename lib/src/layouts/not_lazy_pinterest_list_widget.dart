@@ -217,7 +217,7 @@ class _NotLazyPinterestListWidgetState<T>
     final int count = endIndex - startIndex;
     final List<Widget> newWidgets = List.generate(
       count,
-      (i) => _buildWidgetForItem(startIndex + i),
+      (i) => _buildWidgetForItem(context, startIndex + i),
     );
 
     setState(() {
@@ -233,7 +233,7 @@ class _NotLazyPinterestListWidgetState<T>
     final int count = endIndex - startIndex;
     final List<Widget> newChildren = List.generate(
       count,
-      (i) => _buildWidgetForItem(startIndex + i),
+      (i) => _buildWidgetForItem(context, startIndex + i),
     );
 
     setState(() {
@@ -283,7 +283,7 @@ class _NotLazyPinterestListWidgetState<T>
   }
 
   /// Builds a keyed widget for an item with animation wrapper.
-  Widget _buildWidgetForItem(int index) {
+  Widget _buildWidgetForItem(BuildContext context, int index) {
     final item = widget.items[index];
 
     return KeyedSubtree(
@@ -295,7 +295,7 @@ class _NotLazyPinterestListWidgetState<T>
           rowIndex: 0,
           columnIndex: 0,
         ),
-        child: widget.itemBuilder(item, index),
+        child: widget.itemBuilder(context, index),
       ),
     );
   }

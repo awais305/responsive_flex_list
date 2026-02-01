@@ -337,7 +337,7 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: items,
-              itemBuilder: (item, index) => Text(item),
+              itemBuilder: (context, index) => Text(items[index]),
             ),
           ),
         );
@@ -355,7 +355,8 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: items,
-              itemBuilder: (item, index) => Text('Index: $index, Value: $item'),
+              itemBuilder: (context, index) =>
+                  Text('Index: $index, Value: ${items[index]}'),
             ),
           ),
         );
@@ -370,7 +371,7 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: const [],
-              itemBuilder: (item, index) => Text('Item $item'),
+              itemBuilder: (context, index) => const Text('Item'),
             ),
           ),
         );
@@ -380,11 +381,12 @@ void main() {
       });
 
       testWidgets('handles single item', (tester) async {
+        final items = const ['Single'];
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: const ['Single'],
-              itemBuilder: (item, index) => Text(item),
+              items: items,
+              itemBuilder: (context, index) => Text(items[index]),
             ),
           ),
         );
@@ -399,9 +401,9 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: items,
-              itemBuilder: (item, index) => SizedBox(
+              itemBuilder: (context, index) => SizedBox(
                 height: 100,
-                child: Text(item),
+                child: Text(items[index]),
               ),
             ),
           ),
@@ -419,10 +421,10 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: const [1, 2, 3],
-              itemBuilder: (item, index) => Container(
+              itemBuilder: (context, index) => Container(
                 height: 100,
                 color: Colors.blue,
-                child: Text('Item $item'),
+                child: Text('Item ${const [1, 2, 3][index]}'),
               ),
             ),
           ),
@@ -434,11 +436,12 @@ void main() {
 
     group('custom spacing', () {
       testWidgets('accepts custom mainAxisSpacing', (tester) async {
+        final items = const [1, 2, 3];
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: const [1, 2, 3],
-              itemBuilder: (item, index) => Text('Item $item'),
+              items: items,
+              itemBuilder: (context, index) => Text('Item ${items[index]}'),
               mainAxisSpacing: 20,
             ),
           ),
@@ -506,8 +509,10 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: items,
-              itemBuilder: (item, index) =>
-                  Text('${item['name']} - ${item['age']}'),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Text('${item['name']} - ${item['age']}');
+              },
             ),
           ),
         );
@@ -526,8 +531,10 @@ void main() {
           MaterialApp(
             home: ResponsiveFlexList.builder(
               items: items,
-              itemBuilder: (item, index) =>
-                  Text('${item['name']}: \$${item['price']}'),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Text('${item['name']}: \$${item['price']}');
+              },
             ),
           ),
         );
@@ -683,14 +690,18 @@ void main() {
 
     group('layout options', () {
       testWidgets('accepts useIntrinsicHeight parameter', (tester) async {
+        final items = const [1, 2, 3];
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3],
-              itemBuilder: (item, index) => SizedBox(
-                height: item * 50.0,
-                child: Text('Item $item'),
-              ),
+              items: items,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return SizedBox(
+                  height: item * 50.0,
+                  child: Text('Item $item'),
+                );
+              },
               mainAxisSeparator: (index, total) => const Divider(),
               crossAxisSeparator: (index, total) => const VerticalDivider(),
               useIntrinsicHeight: true,

@@ -196,7 +196,7 @@ class SliverInstagramGrid<T> extends StatelessWidget {
     List<List<int>> patterns,
   ) {
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (layoutContext, constraints) {
         // Determine which pattern to use (cycles through available patterns)
         final pattern = patterns[rowIndex % patterns.length];
 
@@ -241,7 +241,7 @@ class SliverInstagramGrid<T> extends StatelessWidget {
             // Stop if we've run out of items
             if (currentItemIndex >= items.length) break;
 
-            final item = items[currentItemIndex];
+            // final item = items[currentItemIndex];
 
             // Wrap item in animation and sized box
             columnChildren.add(
@@ -253,7 +253,7 @@ class SliverInstagramGrid<T> extends StatelessWidget {
                 ),
                 child: SizedBox(
                   height: itemHeight,
-                  child: itemBuilder(item, currentItemIndex),
+                  child: itemBuilder(layoutContext, currentItemIndex),
                 ),
               ),
             );

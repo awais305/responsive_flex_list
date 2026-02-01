@@ -82,7 +82,8 @@ class CustomBreakpointsExample extends StatelessWidget {
                 },
                 items: List.generate(20, (index) => 'Item ${index + 1}'),
                 breakpoints: customBreakpoints,
-                itemBuilder: (item, index) {
+                itemBuilder: (context, index) {
+                  final item = 'Item ${index + 1}';
                   return Container(
                     height: 80,
                     margin: const EdgeInsets.all(4),

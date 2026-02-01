@@ -99,35 +99,43 @@ class ListsRowBuilder<T> extends StatelessWidget {
         case MainAxisSeparatorMode.itemWidth:
           children.add(
             Expanded(
-              child: item == null
-                  ? const SizedBox.shrink()
-                  : AnimateItemWrapper(
+              child: Column(
+                children: [
+                  // Add separator above item (except for first row)
+                  if (rowIndex != 0)
+                    AnimateItemWrapper(
                       animations: animations,
                       index: animationIndex,
                       maxStaggeredItems: maxStaggeredItems,
                       animationType: animationType,
                       rtlOptions: rtlOptions,
                       customAnimationBuilder: customAnimationBuilder,
-                      child: Column(
-                        children: [
-                          // Add separator above item (except for first row)
-                          if (rowIndex != 0)
-                            Padding(
-                              // Add horizontal padding to match item spacing
-                              padding: EdgeInsets.only(
-                                left: isRTL ? rightPadding : leftPadding,
-                                right: isRTL ? leftPadding : rightPadding,
-                              ),
-                              child: mainAxisSeparator?.call(
-                                rowIndex - 1, // Start index from 0
-                                totalRows,
-                              ),
-                            ),
-                          if (itemBuilder != null)
-                            itemBuilder!(item, startIndex + i),
-                        ],
+                      child: Padding(
+                        // Add horizontal padding to match item spacing
+                        padding: EdgeInsets.only(
+                          left: isRTL ? rightPadding : leftPadding,
+                          right: isRTL ? leftPadding : rightPadding,
+                        ),
+                        child: mainAxisSeparator?.call(
+                          rowIndex - 1, // Start index from 0
+                          totalRows,
+                        ),
                       ),
                     ),
+                  // Only show item if not null
+                  if (item != null)
+                    AnimateItemWrapper(
+                      animations: animations,
+                      index: animationIndex,
+                      maxStaggeredItems: maxStaggeredItems,
+                      animationType: animationType,
+                      rtlOptions: rtlOptions,
+                      customAnimationBuilder: customAnimationBuilder,
+                      child: itemBuilder?.call(context, startIndex + i) ??
+                          const SizedBox.shrink(),
+                    ),
+                ],
+              ),
             ),
           );
 
@@ -148,7 +156,7 @@ class ListsRowBuilder<T> extends StatelessWidget {
                       child: itemBuilder == null
                           ? const SizedBox.shrink()
                           // this index is item index
-                          : itemBuilder!(item, startIndex + i),
+                          : itemBuilder!(context, startIndex + i),
                     ),
             ),
           );
@@ -156,9 +164,8 @@ class ListsRowBuilder<T> extends StatelessWidget {
       }
 
       // Add vertical separator between items (except after last item)
-      if (i < paddedItems.length - 1) {
-        final T? nextItem = paddedItems[i + 1];
-
+      // Only add separator if current item exists AND it's not the last column
+      if (i < paddedItems.length - 1 && item != null) {
         children.add(
           AnimateItemWrapper(
             index: animationIndex,
@@ -170,7 +177,6 @@ class ListsRowBuilder<T> extends StatelessWidget {
             child: _buildCrossAxisSeparator(
               columnIndex: i,
               isNotLastRow: isNotLastRow,
-              isNextEmpty: nextItem == null,
               crossAxisSeparator: crossAxisSeparator,
               isWhiteSpaceDivider: isWhiteSpaceDivider,
               mainAxisSeparatorMode: mainAxisSeparatorMode,
@@ -210,7 +216,6 @@ class ListsRowBuilder<T> extends StatelessWidget {
   /// Builds a vertical separator between columns with proper spacing.
   Widget _buildCrossAxisSeparator({
     required bool isNotLastRow,
-    required bool isNextEmpty,
     required bool isWhiteSpaceDivider,
     required double crossAxisSpacing,
     required MainAxisSeparatorMode mainAxisSeparatorMode,
@@ -237,7 +242,7 @@ class ListsRowBuilder<T> extends StatelessWidget {
       );
     }
 
-    // Hide separator if next item is empty, but preserve layout space
-    return isNextEmpty ? Opacity(opacity: 0, child: separator) : separator;
+    // Always show separator after actual items
+    return separator;
   }
 }

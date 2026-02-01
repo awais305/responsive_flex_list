@@ -1,3 +1,10 @@
+## [1.1.0] - 01 Feb 2026
+
+- **Breaking Change**: Updated `ItemBuilder<T>` signature from `Widget Function(T item, int index)` to `Widget Function(BuildContext context, int index)`. This change provides access to the build context for more advanced widget building. Users can access items from the parent list using the `index` parameter.
+- **Enhancement**: Updated all layout implementations (RoundRobinLayout, MasonryInstagramLayout, NotLazyPinterestListWidget, ListsRowBuilder) to support the new ItemBuilder signature.
+- **Documentation**: Updated README with examples demonstrating the new ItemBuilder usage pattern.
+- **Tests**: Updated all test cases to reflect the new ItemBuilder signature.
+
 ## [1.0.1] - 10 Jan 2026
 
 - Updated README with clearer usage instructions

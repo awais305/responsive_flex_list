@@ -8,11 +8,12 @@ void main() {
   );
   group('ResponsiveFlexMasonry.instagram', () {
     testWidgets('builds with required parameters', (tester) async {
+      final items = const [1, 2, 3];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: const [1, 2, 3],
-            itemBuilder: (item, index) => Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => Text('Item ${items[index]}'),
           ),
         ),
       );
@@ -24,14 +25,15 @@ void main() {
 
     testWidgets('applies default spacing values', (tester) async {
       // Test that default mainAxisSpacing = 1 and crossAxisSpacing = 1
+      final items = const [1, 2];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: const [1, 2],
-            itemBuilder: (item, index) => SizedBox(
-              key: ValueKey('item-$item'),
+            items: items,
+            itemBuilder: (context, index) => SizedBox(
+              key: ValueKey('item-${items[index]}'),
               height: 100,
-              child: Text('Item $item'),
+              child: Text('Item ${items[index]}'),
             ),
           ),
         ),
@@ -41,11 +43,12 @@ void main() {
     });
 
     testWidgets('accepts custom spacing parameters', (tester) async {
+      final items = const [1, 2, 3];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: const [1, 2, 3],
-            itemBuilder: (item, index) => Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => Text('Item ${items[index]}'),
             mainAxisSpacing: 20,
             crossAxisSpacing: 15,
           ),
@@ -58,10 +61,11 @@ void main() {
     testWidgets(
         'throws assertion error when animationDuration is set without animation',
         (tester) async {
+      final items = const [1, 2, 3];
       expect(
         () => ResponsiveFlexMasonry.instagram(
-          items: const [1, 2, 3],
-          itemBuilder: (item, index) => Text('Item $item'),
+          items: items,
+          itemBuilder: (context, index) => Text('Item ${items[index]}'),
           animationDuration: const Duration(milliseconds: 300),
           animationType: ResponsiveAnimationType.none,
         ),
@@ -70,11 +74,12 @@ void main() {
     });
 
     testWidgets('builds with animation enabled', (tester) async {
+      final items = const [1, 2, 3];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: const [1, 2, 3],
-            itemBuilder: (item, index) => Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => Text('Item ${items[index]}'),
             animationDuration: const Duration(milliseconds: 300),
             animationType: ResponsiveAnimationType.fade,
           ),
@@ -85,11 +90,12 @@ void main() {
     });
 
     testWidgets('builds with RTL options', (tester) async {
+      final items = const [1, 2, 3];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: const [1, 2, 3],
-            itemBuilder: (item, index) => Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => Text('Item ${items[index]}'),
             rtlOptions:
                 const RTLOptions(mirrorAnimations: true, reverseRowOrder: true),
           ),
@@ -102,13 +108,14 @@ void main() {
 
   group('ResponsiveFlexMasonry.pinterest', () {
     testWidgets('builds with required parameters', (tester) async {
+      final items = const [1, 2, 3, 4];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: const [1, 2, 3, 4],
-            itemBuilder: (item, index) => SizedBox(
-              height: 100.0 * item, // Varying heights for masonry
-              child: Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => SizedBox(
+              height: 100.0 * items[index], // Varying heights for masonry
+              child: Text('Item ${items[index]}'),
             ),
           ),
         ),
@@ -120,11 +127,12 @@ void main() {
 
     testWidgets('applies default spacing for pinterest layout', (tester) async {
       // Pinterest defaults: mainAxisSpacing = 15, crossAxisSpacing = 10
+      final items = const [1, 2];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: const [1, 2],
-            itemBuilder: (item, index) => Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => Text('Item ${items[index]}'),
           ),
         ),
       );
@@ -133,11 +141,12 @@ void main() {
     });
 
     testWidgets('handles empty items list', (tester) async {
+      final items = const [];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: const [],
-            itemBuilder: (item, index) => Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => const Text('Item'),
           ),
         ),
       );
@@ -155,17 +164,20 @@ void main() {
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
             items: imagesWithCaptions,
-            itemBuilder: (item, index) => Column(
-              children: [
-                if (item['url'] != null)
-                  Image.network(
-                    item['url']!,
-                    fit: BoxFit.fitWidth,
-                    width: double.infinity,
-                  ),
-                Text(item['captions'] ?? ''),
-              ],
-            ),
+            itemBuilder: (context, index) {
+              final item = imagesWithCaptions[index];
+              return Column(
+                children: [
+                  if (item['url'] != null)
+                    Image.network(
+                      item['url']!,
+                      fit: BoxFit.fitWidth,
+                      width: double.infinity,
+                    ),
+                  Text(item['captions'] ?? ''),
+                ],
+              );
+            },
             onLoadingProgress: (loaded, total) {
               callbackCount++;
               lastLoaded = loaded;
@@ -189,12 +201,13 @@ void main() {
     });
 
     testWidgets('respects shrinkWrap parameter', (tester) async {
+      final items = const [1, 2, 3];
       await tester.pumpWidget(
         MaterialApp(
           home: SingleChildScrollView(
             child: ResponsiveFlexMasonry.pinterest(
-              items: const [1, 2, 3],
-              itemBuilder: (item, index) => Text('Item $item'),
+              items: items,
+              itemBuilder: (context, index) => Text('Item ${items[index]}'),
               shrinkWrap: true,
             ),
           ),
@@ -207,11 +220,12 @@ void main() {
 
   group('ResponsiveFlexMasonry edge cases', () {
     testWidgets('handles single item', (tester) async {
+      final items = const [1];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: const [1],
-            itemBuilder: (item, index) => const Text('Single Item'),
+            items: items,
+            itemBuilder: (context, index) => const Text('Single Item'),
           ),
         ),
       );
@@ -220,11 +234,12 @@ void main() {
     });
 
     testWidgets('builds with all optional parameters', (tester) async {
+      final items = const [1, 2, 3];
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: const [1, 2, 3],
-            itemBuilder: (item, index) => Text('Item $item'),
+            items: items,
+            itemBuilder: (context, index) => Text('Item ${items[index]}'),
             crossAxisCount: 3,
             padding: const EdgeInsets.all(16),
             shrinkWrap: true,

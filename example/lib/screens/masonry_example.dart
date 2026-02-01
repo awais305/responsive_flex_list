@@ -36,7 +36,8 @@ class _MasonryExampleState extends State<MasonryExample> {
                     _total = total;
                   });
                 },
-                itemBuilder: (item, index) => _returnImageWidget(item, index),
+                itemBuilder: (context, index) =>
+                    _returnImageWidget(imagesWithCaptions[index], index),
               ),
               if (isImagesLoaded == false)
                 Material(

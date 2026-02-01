@@ -129,41 +129,19 @@ class _SeparatorExampleState extends State<SeparatorExample> {
                 : ResponsiveFlexList.withSeparators(
                     roundRobinLayout: roundRobinLayout,
                     padding: EdgeInsets.symmetric(horizontal: 10),
-                    animationType: ResponsiveAnimationType.slide,
+                    animationType: ResponsiveAnimationType.bounce,
+                    animationDuration: Duration(seconds: 1),
                     animationFlow: AnimationFlow.byRow,
                     useIntrinsicHeight: true,
                     mainAxisSeparatorMode: mainAxisSeparatorMode,
-                    mainAxisSeparator: (rowIndex, totalRows) => Container(
-                      height: 2,
-                      // color: Colors.grey.shade400,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            Colors.blue[200]!,
-                            Colors.transparent,
-                          ],
-                        ),
-                      ),
-                    ),
+                    mainAxisSeparator: (rowIndex, totalRows) =>
+                        Divider(thickness: 2, height: 2),
                     crossAxisSeparator: (columnIndex, totalColumns) =>
-                        Container(
-                          width: 2,
-                          // color: Colors.grey.shade400,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                Colors.blue[200]!,
-                                Colors.transparent,
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                          ),
-                        ),
+                        VerticalDivider(thickness: 2, width: 2),
                     items: posts,
-                    itemBuilder: (item, index) {
+                    itemBuilder: (context, index) {
+                      final item = posts[index];
+
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(

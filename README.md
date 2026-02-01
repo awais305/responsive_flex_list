@@ -3,7 +3,6 @@
 <p align="center">
   <a href="https://pub.dev/packages/responsive_flex_list"><img src="https://img.shields.io/pub/v/responsive_flex_list.svg" alt="pub package"></a>
   <a href="https://pub.dev/packages/responsive_flex_list/score"><img src="https://img.shields.io/pub/likes/responsive_flex_list" alt="likes"></a>
-  <a href="https://pub.dev/packages/responsive_flex_list/score"><img src="https://img.shields.io/pub/popularity/responsive_flex_list" alt="popularity"></a>
   <a href="https://pub.dev/packages/responsive_flex_list/score"><img src="https://img.shields.io/pub/points/responsive_flex_list" alt="pub points"></a>
 </p>
 
@@ -43,9 +42,9 @@ import 'package:flutter/material.dart';
 import 'package:responsive_flex_list/responsive_flex_list.dart';
 
 void main() {
-  // Optional: Initialize custom breakpoints
+// Optional: Initialize custom breakpoints
   // ResponsiveConfig.init(
-  //  breakpoints: Breakpoints.defaultBreakpoints or Breakpoints.onlyWith(...) or Breakpoints(...)
+  //   breakpoints: Breakpoints.defaultBreakpoints or Breakpoints.onlyWith(...) or Breakpoints(...)
   // );
 
   runApp(const MyApp());
@@ -88,13 +87,18 @@ ResponsiveFlexList(
 ```dart
 ResponsiveFlexList.builder(
   items: products,
-  itemBuilder: (product, index) => ProductCard(
-    title: product.name,
-    price: product.price,
-  ),
+  itemBuilder: (context, index) {
+    final product = products[index];
+    return ProductCard(
+      title: product.name,
+      price: product.price,
+    );
+  },
   animationType: AnimationType.slideUp,
 )
 ```
+
+**Note:** The `itemBuilder` now receives `BuildContext context` and `int index`. Access items from your list using the index parameter.
 
 ### Force List Mode (1 Column)
 
@@ -119,7 +123,7 @@ ResponsiveFlexList(
 ```dart
 ResponsiveFlexList.builder(
   items: items,
-  itemBuilder: (item, index) => MyCard(item),
+  itemBuilder: (context, index) => MyCard(item),
   breakpoints: Breakpoints(
     tablet: 900,        // Custom tablet breakpoint
     desktopColumns: 6,  // 6 columns on desktop
@@ -197,11 +201,14 @@ Perfectly replicates Instagram Explore layout
 ```dart
 ResponsiveFlexMasonry.instagram(
   items: photos,
-  itemBuilder: (photo, index) => Image.network(
+  itemBuilder: (context, index) {
+    final photo = photos[index];
+    return Image.network(
       photo.url,
       fit: BoxFit.cover,
       width: double.infinity,
-    ),
+    );
+  },
   maxRowHeightMultiplier: 1.0, // Adjust if needed
 )
 ```
@@ -215,7 +222,10 @@ Pinterest-style masonry with variable heights
 ```dart
 ResponsiveFlexMasonry.pinterest(
   items: products,
-  itemBuilder: (product, index) => ProductCard(product),
+  itemBuilder: (context, index) {
+    final product = products[index];
+    return ProductCard(product)
+  },
 )
 ```
 
@@ -228,7 +238,10 @@ Add separators that work intelligently across list and grid modes:
 ```dart
 ResponsiveFlexList.withSeparators(
   items: listItems,
-  itemBuilder: (item, index) => ListTile(title: Text(item)),
+  itemBuilder: (context, index) {
+    final item = listItems[index];
+    return ListTile(title: Text(item));
+  },
 
   // Horizontal dividers between rows
   mainAxisSeparator: (rowIndex, totalRows) => Divider(color: Colors.grey),

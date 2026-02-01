@@ -63,7 +63,7 @@ import 'package:responsive_flex_list/src/widgets/base_responsive_widget.dart';
 
 ///
 /// These can be customized using the [breakpoints] parameter.
-class ResponsiveFlexList<T> extends BaseResponsiveWidget<T> {
+class ResponsiveFlexList extends BaseResponsiveWidget {
   /// Creates a responsive list view with predefined children.
   ///
   /// This constructor is best used when you have a fixed list of widgets
