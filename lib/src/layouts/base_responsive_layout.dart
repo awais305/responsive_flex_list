@@ -11,11 +11,16 @@ import 'package:responsive_flex_list/src/widgets/lists_row_builder.dart';
 ///
 /// This class provides common properties and behaviors shared across
 /// all layout implementations, ensuring consistency and reducing code duplication.
-abstract class BaseResponsiveLayout<T> extends StatelessWidget {
+abstract class BaseResponsiveLayout extends StatelessWidget {
   // Core list properties
   final GlobalKey? listKey;
-  final List<T> items;
-  final ItemBuilder<T>? itemBuilder;
+  final int itemCount;
+  final ItemBuilder? itemBuilder;
+
+  /// [Deprecated] Use [itemCount] instead.
+  @Deprecated('Use itemCount instead')
+  final List? items;
+
   final int crossAxisCount;
 
   // Scroll-related properties
@@ -52,7 +57,7 @@ abstract class BaseResponsiveLayout<T> extends StatelessWidget {
   const BaseResponsiveLayout({
     super.key,
     this.listKey,
-    required this.items,
+    required this.itemCount,
     this.itemBuilder,
     required this.crossAxisCount,
     this.padding,
@@ -76,6 +81,7 @@ abstract class BaseResponsiveLayout<T> extends StatelessWidget {
     required this.maxStaggeredItems,
     this.customAnimationBuilder,
     this.mainAxisSeparatorMode,
+    @Deprecated('Use itemCount instead') this.items,
   });
 
   /// Abstract method that must be implemented by concrete layout classes
@@ -93,7 +99,7 @@ abstract class BaseResponsiveLayout<T> extends StatelessWidget {
     }
 
     // Empty state handling
-    if (items.isEmpty) {
+    if (itemCount == 0) {
       return buildEmptyState();
     }
 
@@ -192,15 +198,7 @@ abstract class BaseResponsiveLayout<T> extends StatelessWidget {
   /// Helper method to calculate total number of rows
   @protected
   int calculateRowCount() {
-    return (items.length / crossAxisCount).ceil();
-  }
-
-  /// Helper method to get items for a specific row
-  @protected
-  List<T> getRowItems(int rowIndex) {
-    final int startIndex = rowIndex * crossAxisCount;
-    final int endIndex = (startIndex + crossAxisCount).clamp(0, items.length);
-    return items.sublist(startIndex, endIndex);
+    return (itemCount / crossAxisCount).ceil();
   }
 
   /// Helper method to apply RTL reversal to a list if needed
@@ -244,7 +242,7 @@ abstract class BaseResponsiveLayout<T> extends StatelessWidget {
     required int rowIndex,
     bool isWhiteSpaceDivider = false,
   }) {
-    return ListsRowBuilder<T>(
+    return ListsRowBuilder(
       isWhiteSpaceDivider: isWhiteSpaceDivider,
       crossAxisSpacing: crossAxisSpacing,
       crossAxisSeparator: crossAxisSeparator,
@@ -253,7 +251,7 @@ abstract class BaseResponsiveLayout<T> extends StatelessWidget {
       rowIndex: rowIndex,
       maxStaggeredItems: maxStaggeredItems,
       crossAxisCount: crossAxisCount,
-      items: items,
+      itemCount: itemCount,
       itemBuilder: itemBuilder,
       useIntrinsicHeight: useIntrinsicHeight,
       isRTL: isRTL,

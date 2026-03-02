@@ -25,7 +25,7 @@ class _MasonryExampleState extends State<MasonryExample> {
             children: [
               ResponsiveFlexMasonry.pinterest(
                 padding: EdgeInsets.all(10),
-                items: imagesWithCaptions,
+                itemCount: imagesWithCaptions.length,
                 crossAxisSpacing: 5,
                 onLoadingProgress: (loaded, total) {
                   if (loaded == total) {

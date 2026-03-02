@@ -1,3 +1,13 @@
+## [1.2.0] - 02 Mar 2026
+
+- **Feature**: Added `minCrossAxisCount` and `maxCrossAxisCount` properties to all responsive widgets. This allows defining explicit column boundaries across different screen sizes.
+- **Breaking Change**: Removed generic type `<T>` from `ResponsiveFlexList`, `ResponsiveFlexMasonry`, and all related widgets and layouts. This simplifies the API and improves maintainability.
+- **Breaking Change**: Replaced `List<T> items` with `int itemCount` in all builder-style constructors. Note: A deprecated `items` parameter is retained for backward compatibility during migration.
+- **Breaking Change**: Updated `ItemBuilder` signature to a simplified `Widget Function(BuildContext context, int index)` without generics. Access your data using the provided index.
+- **Internal**: Optimized performance by calculating stagger limits dynamically within the build phase.
+- **Improvement**: Refactored animation stagger logic to be dynamic based on the actual column count. This ensures consistent full-screen animation coverage even when using custom column boundaries.
+- **Improvement**: Updated all internal layout engines to support the new pattern.
+
 ## [1.1.0] - 01 Feb 2026
 
 - **Breaking Change**: Updated `ItemBuilder<T>` signature from `Widget Function(T item, int index)` to `Widget Function(BuildContext context, int index)`. This change provides access to the build context for more advanced widget building. Users can access items from the parent list using the `index` parameter.

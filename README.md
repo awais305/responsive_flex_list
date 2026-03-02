@@ -24,7 +24,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  responsive_flex_list: <latest>
+  responsive_flex_list: ^1.2.0
 ```
 
 Then run:
@@ -86,7 +86,7 @@ ResponsiveFlexList(
 
 ```dart
 ResponsiveFlexList.builder(
-  items: products,
+  itemCount: products.length,
   itemBuilder: (context, index) {
     final product = products[index];
     return ProductCard(
@@ -94,7 +94,7 @@ ResponsiveFlexList.builder(
       price: product.price,
     );
   },
-  animationType: AnimationType.slideUp,
+  animationType: ResponsiveAnimationType.slideUp,
 )
 ```
 
@@ -118,12 +118,24 @@ ResponsiveFlexList(
 )
 ```
 
+### Column Boundaries (Min/Max)
+
+Define boundaries while still allowing responsiveness within that range:
+
+```dart
+ResponsiveFlexList(
+  minCrossAxisCount: 2, // At least 2 columns even on small phones
+  maxCrossAxisCount: 4, // At most 4 columns even on ultra-wide screens
+  children: items,
+)
+```
+
 ### Custom Breakpoints
 
 ```dart
 ResponsiveFlexList.builder(
-  items: items,
-  itemBuilder: (context, index) => MyCard(item),
+  itemCount: items.length,
+  itemBuilder: (context, index) => MyCard(items[index]),
   breakpoints: Breakpoints(
     tablet: 900,        // Custom tablet breakpoint
     desktopColumns: 6,  // 6 columns on desktop
@@ -161,7 +173,7 @@ Choose from 8 pre-built animations:
 ```dart
 ResponsiveFlexList(
   children: items,
-  animationType: AnimationType.bounce,
+  animationType: ResponsiveAnimationType.bounce,
   // Options:
   // • none          - No animation (default)
   // • fade          - Gentle fade in
@@ -200,7 +212,7 @@ Perfectly replicates Instagram Explore layout
 
 ```dart
 ResponsiveFlexMasonry.instagram(
-  items: photos,
+  itemCount: photos.length,
   itemBuilder: (context, index) {
     final photo = photos[index];
     return Image.network(
@@ -221,7 +233,7 @@ Pinterest-style masonry with variable heights
 
 ```dart
 ResponsiveFlexMasonry.pinterest(
-  items: products,
+  itemCount: products.length,
   itemBuilder: (context, index) {
     final product = products[index];
     return ProductCard(product)
@@ -237,7 +249,7 @@ Add separators that work intelligently across list and grid modes:
 
 ```dart
 ResponsiveFlexList.withSeparators(
-  items: listItems,
+  itemCount: listItems.length,
   itemBuilder: (context, index) {
     final item = listItems[index];
     return ListTile(title: Text(item));
@@ -253,7 +265,7 @@ ResponsiveFlexList.withSeparators(
   ),
 
   // Control divider width behavior
-  mainAxisSeparatorMode: SeparatorMode.fullWidth, // or itemWidth
+  mainAxisSeparatorMode: MainAxisSeparatorMode.fullWidth, // or itemWidth
 
   // Required when displaying vertical dividers
   useIntrinsicHeight: true,
@@ -288,13 +300,15 @@ ResponsiveFlexList.withSeparators(
 | Property                 | Description                                    | Example                                      |
 | ------------------------ | ---------------------------------------------- | -------------------------------------------- |
 | `crossAxisCount`         | Force a specific number of columns             | `1` = list, `3` = 3-col grid                 |
-| `animationType`          | Animation style for item transitions           | `AnimationType.bounce`                       |
+| `minCrossAxisCount`      | Minimum number of columns to display           | `2`                                          |
+| `maxCrossAxisCount`      | Maximum number of columns to display           | `5`                                          |
+| `animationType`          | Animation style for item transitions           | `ResponsiveAnimationType.bounce`             |
 | `animationFlow`          | Controls animation sequence                    | `AnimationFlow.byRow`                        |
 | `breakpoints`            | Custom breakpoint values                       | `Breakpoints(tablet: 800)`                   |
 | `crossAxisSeparator`     | Widget between columns                         | `VerticalDivider(width: 1)`                  |
 | `crossAxisSpacing`       | Horizontal spacing between columns             | `8.0`                                        |
 | `mainAxisSeparator`      | Widget between rows                            | `Divider(thickness: 1)`                      |
-| `mainAxisSeparatorMode`  | How horizontal separators display              | `SeparatorMode.itemWidth`                    |
+| `mainAxisSeparatorMode`  | How horizontal separators display              | `MainAxisSeparatorMode.itemWidth`            |
 | `roundRobinLayout`       | Distributes items sequentially across columns  | `true`                                       |
 | `mainAxisSpacing`        | Vertical spacing between rows                  | `8.0`                                        |
 | `useIntrinsicHeight`     | Match row heights to tallest item in row       | `true`                                       |

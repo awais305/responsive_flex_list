@@ -336,7 +336,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) => Text(items[index]),
             ),
           ),
@@ -354,7 +354,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) =>
                   Text('Index: $index, Value: ${items[index]}'),
             ),
@@ -370,7 +370,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: const [],
+              itemCount: 0,
               itemBuilder: (context, index) => const Text('Item'),
             ),
           ),
@@ -385,7 +385,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) => Text(items[index]),
             ),
           ),
@@ -400,7 +400,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) => SizedBox(
                 height: 100,
                 child: Text(items[index]),
@@ -420,7 +420,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (context, index) => Container(
                 height: 100,
                 color: Colors.blue,
@@ -440,7 +440,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) => Text('Item ${items[index]}'),
               mainAxisSpacing: 20,
             ),
@@ -454,7 +454,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               crossAxisSpacing: 15,
             ),
@@ -471,8 +471,8 @@ void main() {
           (tester) async {
         expect(
           () => ResponsiveFlexList.builder(
-            items: const [1, 2, 3],
-            itemBuilder: (item, index) => Text('Item $item'),
+            itemCount: 3,
+            itemBuilder: (context, index) => Text('Item $index'),
             animationDuration: const Duration(milliseconds: 300),
             animationType: ResponsiveAnimationType.none,
           ),
@@ -484,7 +484,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               animationDuration: const Duration(milliseconds: 300),
               animationType: ResponsiveAnimationType.fade,
@@ -508,7 +508,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) {
                 final item = items[index];
                 return Text('${item['name']} - ${item['age']}');
@@ -530,7 +530,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.builder(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) {
                 final item = items[index];
                 return Text('${item['name']}: \$${item['price']}');
@@ -554,10 +554,12 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3],
-              itemBuilder: (item, index) => Text('Item $item'),
-              mainAxisSeparator: (index, total) => const Divider(thickness: 2),
-              crossAxisSeparator: (index, total) =>
+              itemCount: const [1, 2, 3].length,
+              itemBuilder: (context, index) =>
+                  Text('Item ${const [1, 2, 3][index]}'),
+              mainAxisSeparator: (int index, int total) =>
+                  const Divider(thickness: 2),
+              crossAxisSeparator: (int index, int total) =>
                   const VerticalDivider(thickness: 1),
             ),
           ),
@@ -575,7 +577,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2],
+              itemCount: const [1, 2].length,
               // assures it behave like list (so it can create divider)
               crossAxisCount: 1,
               itemBuilder: (item, index) => Text('Item $item'),
@@ -592,7 +594,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2],
+              itemCount: const [1, 2].length,
               itemBuilder: (item, index) => Text('Item $item'),
               mainAxisSeparator: (index, total) => const Divider(),
               crossAxisSeparator: (index, total) => const VerticalDivider(),
@@ -609,7 +611,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               crossAxisCount: 1,
               mainAxisSeparator: (index, total) => const Divider(
@@ -632,7 +634,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               mainAxisSeparator: (index, total) => Container(
                 height: 2,
@@ -655,7 +657,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               mainAxisSeparator: (index, total) => const Divider(),
               crossAxisSeparator: (index, total) => const VerticalDivider(),
@@ -673,7 +675,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               mainAxisSeparator: (index, total) => const Divider(),
               crossAxisSeparator: (index, total) => const VerticalDivider(),
@@ -694,7 +696,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) {
                 final item = items[index];
                 return SizedBox(
@@ -716,7 +718,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3],
+              itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               mainAxisSeparator: (index, total) => const Divider(),
               crossAxisSeparator: (index, total) => const VerticalDivider(),
@@ -732,7 +734,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: ResponsiveFlexList.withSeparators(
-              items: const [1, 2, 3, 4, 5],
+              itemCount: const [1, 2, 3, 4, 5].length,
               itemBuilder: (item, index) => SizedBox(
                 height: 100,
                 child: Text('Item $item'),
@@ -746,6 +748,32 @@ void main() {
 
         expect(find.byType(ResponsiveFlexList), findsOneWidget);
       });
+
+      testWidgets('forwards physics when roundRobinLayout is true',
+          (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ResponsiveFlexList.withSeparators(
+              itemCount: 5,
+              itemBuilder: (item, index) => Text('Item $index'),
+              mainAxisSeparator: (index, total) => const Divider(),
+              crossAxisSeparator: (index, total) => const VerticalDivider(),
+              roundRobinLayout: true,
+              physics: const NeverScrollableScrollPhysics(),
+            ),
+          ),
+        );
+
+        final customScroll = tester.widget<CustomScrollView>(
+          find
+              .descendant(
+                of: find.byType(ResponsiveFlexList),
+                matching: find.byType(CustomScrollView),
+              )
+              .first,
+        );
+        expect(customScroll.physics, isA<NeverScrollableScrollPhysics>());
+      });
     });
   });
 
@@ -757,8 +785,8 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexList.builder(
-            items: const [1, 2, 3],
-            itemBuilder: (item, index) => Text('Item $item'),
+            itemCount: 4,
+            itemBuilder: (context, index) => Text('Item $index'),
             crossAxisCount: 3,
             padding: const EdgeInsets.all(16),
             shrinkWrap: true,
@@ -785,7 +813,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexList.builder(
-            items: largeList,
+            itemCount: largeList.length,
             itemBuilder: (item, index) => SizedBox(
               height: 50,
               child: Text('Item $item'),
@@ -807,7 +835,7 @@ void main() {
                 ResponsiveFlexList.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  items: const [1, 2, 3],
+                  itemCount: const [1, 2, 3].length,
                   itemBuilder: (item, index) => SizedBox(
                     height: 100,
                     child: Text('Item $item'),
@@ -823,6 +851,59 @@ void main() {
       expect(find.text('Header'), findsOneWidget);
       expect(find.text('Footer'), findsOneWidget);
       expect(find.byType(ResponsiveFlexList), findsOneWidget);
+    });
+    testWidgets('respects minCrossAxisCount boundary', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(300, 600)); // Small mobile
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            minCrossAxisCount: 2,
+            children: [
+              SizedBox(height: 100, child: Text('Item 1')),
+              SizedBox(height: 100, child: Text('Item 2')),
+              SizedBox(height: 100, child: Text('Item 3')),
+            ],
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final item1Pos = tester.getCenter(find.text('Item 1'));
+      final item2Pos = tester.getCenter(find.text('Item 2'));
+
+      expect(item1Pos.dy, equals(item2Pos.dy)); // Same row
+
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    testWidgets('respects maxCrossAxisCount boundary', (tester) async {
+      await tester.binding
+          .setSurfaceSize(const Size(1400, 600)); // Large desktop
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexList(
+            maxCrossAxisCount: 3,
+            children: List.generate(10, (i) => Text('Item $i')),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final item1Pos = tester.getCenter(find.text('Item 0'));
+      final item2Pos = tester.getCenter(find.text('Item 1'));
+      final item3Pos = tester.getCenter(find.text('Item 2'));
+      final item4Pos = tester.getCenter(find.text('Item 3'));
+
+      expect(item1Pos.dy, equals(item2Pos.dy));
+      expect(item2Pos.dy, equals(item3Pos.dy));
+      expect(item3Pos.dy,
+          isNot(equals(item4Pos.dy))); // Item 3 should be on next row
+
+      await tester.binding.setSurfaceSize(null);
     });
   });
 }

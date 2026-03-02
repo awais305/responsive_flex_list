@@ -29,6 +29,7 @@ class ChildrenExample extends StatelessWidget {
               child: ResponsiveFlexList(
                 animationType: ResponsiveAnimationType.slide,
                 animationFlow: AnimationFlow.individual,
+                minCrossAxisCount: 3,
                 children: List.generate(
                   12,
                   (index) => _buildColorCard(

@@ -14,12 +14,12 @@ import 'package:responsive_flex_list/src/widgets/flex_error_widget.dart';
 ///
 /// Generic over type [T], which represents the data model for list items.
 ///
-class ListAnimations<T> extends StatefulWidget {
+class ListAnimations extends StatefulWidget {
   /// Creates a [ListAnimations] instance.
   const ListAnimations({
     super.key,
     required this.type,
-    required this.items,
+    required this.itemCount,
     required this.children,
     this.itemBuilder,
     required this.crossAxisCount,
@@ -50,13 +50,20 @@ class ListAnimations<T> extends StatefulWidget {
     required this.roundRobinLayout,
     this.maxRowHeight,
     this.onLoadingProgress,
+    this.cacheChildren = true,
+    @Deprecated('Use itemCount instead') this.items,
   });
 
   final ResponsiveListType type;
-  final List<T> items;
+  final int itemCount;
   final int crossAxisCount;
   final List<Widget> children;
-  final ItemBuilder<T>? itemBuilder;
+  final ItemBuilder? itemBuilder;
+
+  /// [Deprecated] Use [itemCount] instead.
+  @Deprecated('Use itemCount instead')
+  final List? items;
+
   final EdgeInsets? padding;
   final ScrollPhysics? physics;
   final ScrollController? controller;
@@ -85,15 +92,20 @@ class ListAnimations<T> extends StatefulWidget {
   final bool isRTL;
   final void Function(int loaded, int total)? onLoadingProgress;
 
+  /// Pinterest layout only: whether items should be cached once built.
+  ///
+  /// Defaults to true. This value is ignored for non-pinterest types.
+  final bool cacheChildren;
+
   @override
-  State<ListAnimations<T>> createState() => ListAnimationsState<T>();
+  State<ListAnimations> createState() => ListAnimationsState();
 }
 
 /// State for [ListAnimations].
 ///
 /// Handles creation of animation controllers, running staggered
 /// animations, building list layouts, and disposing controllers.
-class ListAnimationsState<T> extends State<ListAnimations<T>>
+class ListAnimationsState extends State<ListAnimations>
     with TickerProviderStateMixin {
   final GlobalKey _listKey = GlobalKey();
   late List<Animation<double>> _animations;
@@ -111,7 +123,7 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
   }
 
   @override
-  void didUpdateWidget(ListAnimations<T> oldWidget) {
+  void didUpdateWidget(ListAnimations oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     final bool wasEmpty = _getOldItemCount(oldWidget) == 0;
@@ -130,16 +142,16 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
     }
   }
 
-  int _getOldItemCount(ListAnimations<T> oldWidget) {
+  int _getOldItemCount(ListAnimations oldWidget) {
     return oldWidget.type == ResponsiveListType.children
         ? oldWidget.children.length
-        : oldWidget.items.length;
+        : oldWidget.itemCount;
   }
 
   int _getCurrentItemCount() {
     return widget.type == ResponsiveListType.children
         ? widget.children.length
-        : widget.items.length;
+        : widget.itemCount;
   }
 
   void _initializeEmptyAnimations() {
@@ -231,7 +243,7 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
     if (widget.type == ResponsiveListType.builder) {
       return BuilderLayout(
         listKey: _listKey,
-        items: widget.items,
+        itemCount: widget.itemCount,
         crossAxisCount: widget.crossAxisCount,
         shrinkWrap: widget.shrinkWrap,
         reverse: widget.reverse,
@@ -250,14 +262,8 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
         padding: widget.padding,
         physics: widget.physics,
         primary: widget.primary,
-        mainAxisSpacing:
-            (widget.mainAxisSpacing == null || widget.mainAxisSpacing! <= 5)
-                ? kDefaultMainAxisSpacing
-                : widget.mainAxisSpacing!,
-        crossAxisSpacing:
-            (widget.crossAxisSpacing == null || widget.crossAxisSpacing! <= 5)
-                ? kDefaultCrossAxisSpacing
-                : widget.crossAxisSpacing,
+        mainAxisSpacing: widget.mainAxisSpacing!,
+        crossAxisSpacing: widget.crossAxisSpacing,
       );
     }
 
@@ -289,7 +295,7 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
     if (widget.type == ResponsiveListType.withSeparators) {
       return WithSeparatorLayout(
         listKey: _listKey,
-        items: widget.items,
+        itemCount: widget.itemCount,
         crossAxisCount: widget.crossAxisCount,
         shrinkWrap: widget.shrinkWrap,
         reverse: widget.reverse,
@@ -318,13 +324,13 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
     }
 
     if (widget.type == ResponsiveListType.instagram) {
-      return InstagramLayout<T>(
+      return InstagramLayout(
         padding: widget.padding,
         maxRowHeightMultiplier: widget.maxRowHeightMultiplier,
         crossAxisCount: widget.crossAxisCount < 4 ? 3 : widget.crossAxisCount,
         mainAxisSpacing: widget.mainAxisSpacing ?? kDefaultMainAxisSpacing,
         maxStaggeredItems: widget.maxStaggeredItems,
-        items: widget.items,
+        itemCount: widget.itemCount,
         itemBuilder: widget.itemBuilder,
         isRTL: widget.isRTL,
         rtlOptions: widget.rtlOptions,
@@ -333,16 +339,18 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
         animationType: widget.animationType,
         crossAxisSpacing: widget.crossAxisSpacing,
         customAnimationBuilder: widget.customAnimationBuilder,
+        shrinkWrap: widget.shrinkWrap,
+        reverse: widget.reverse,
       );
     }
     if (widget.type == ResponsiveListType.pinterest) {
-      return PinterestLayout<T>(
+      return PinterestLayout(
         padding: widget.padding,
         mainAxisSpacing: widget.mainAxisSpacing ?? kDefaultMainAxisSpacing,
         crossAxisSpacing: widget.crossAxisSpacing,
         maxStaggeredItems: widget.maxStaggeredItems,
         crossAxisCount: widget.crossAxisCount <= 2 ? 2 : widget.crossAxisCount,
-        items: widget.items,
+        itemCount: widget.itemCount,
         itemBuilder: widget.itemBuilder,
         isRTL: widget.isRTL,
         rtlOptions: widget.rtlOptions,
@@ -350,7 +358,14 @@ class ListAnimationsState<T> extends State<ListAnimations<T>>
         animations: animations,
         animationType: widget.animationType,
         onLoadingProgress: widget.onLoadingProgress,
+        cacheChildren: widget.cacheChildren,
         customAnimationBuilder: widget.customAnimationBuilder,
+        shrinkWrap: widget.shrinkWrap,
+        reverse: widget.reverse,
+        physics: widget.physics,
+        controller: widget.controller,
+        primary: widget.primary,
+        cacheExtent: widget.cacheExtent,
       );
     }
 

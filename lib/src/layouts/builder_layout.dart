@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:responsive_flex_list/src/layouts/base_responsive_layout.dart';
 
 /// Builder layout implementation extending the base abstract class
-class BuilderLayout<T> extends BaseResponsiveLayout<T> {
+class BuilderLayout extends BaseResponsiveLayout {
   const BuilderLayout({
     super.key,
     super.listKey,
-    required super.items,
+    required super.itemCount,
     super.itemBuilder,
     required super.crossAxisCount,
     super.padding,
@@ -27,6 +27,7 @@ class BuilderLayout<T> extends BaseResponsiveLayout<T> {
     required super.animationType,
     required super.maxStaggeredItems,
     super.customAnimationBuilder,
+    super.items,
   }) : super(mainAxisSpacing: mainAxisSpacing);
 
   @override

@@ -8,32 +8,49 @@ import 'package:responsive_flex_list/src/layouts/not_lazy_pinterest_list_widget.
 /// Items are distributed across columns to create a visually balanced masonry grid,
 /// similar to Pinterest's layout. Automatically switches to smoother scroll physics
 /// for large lists (800+ items) to improve performance.
-class PinterestLayout<T> extends BaseResponsiveLayout<T> {
+class PinterestLayout extends BaseResponsiveLayout {
   final void Function(int loaded, int total)? onLoadingProgress;
+
+  /// Whether the pinterest layout will cache widgets once built.
+  ///
+  /// By default this is true for backwards compatibility; cached mode
+  /// prevents unnecessary rebuilds but can also hold memory for long lists.
+  final bool cacheChildren;
 
   const PinterestLayout({
     required this.onLoadingProgress,
+    this.cacheChildren = true,
     super.key,
     super.crossAxisSpacing,
     super.padding,
+    super.physics,
     super.mainAxisSpacing,
     required super.maxStaggeredItems,
     required super.crossAxisCount,
-    required super.items,
-    required super.itemBuilder,
+    required super.itemCount,
+    super.itemBuilder,
     required super.isRTL,
     required super.rtlOptions,
     required super.animationFlow,
     required super.animations,
     required super.animationType,
     super.customAnimationBuilder,
-  }) : super(shrinkWrap: false, reverse: false, useIntrinsicHeight: false);
+    super.items,
+    required super.shrinkWrap,
+    required super.reverse,
+    super.controller,
+    super.primary,
+    super.cacheExtent,
+  }) : super(useIntrinsicHeight: false);
 
   @override
   Widget buildLayout(BuildContext context) {
+    // Use provided physics, or smoother variant for large lists
+    final ScrollPhysics? effectivePhysics =
+        physics ?? (itemCount < 800 ? null : const SmoothScrollPhysics());
+
     return CustomScrollView(
-      // Use smoother physics for large lists to prevent janky scrolling
-      physics: items.length < 800 ? physics : const SmoothScrollPhysics(),
+      physics: effectivePhysics,
       primary: primary,
       controller: controller,
       reverse: reverse,
@@ -43,8 +60,8 @@ class PinterestLayout<T> extends BaseResponsiveLayout<T> {
         SliverPadding(
           padding: padding ?? const EdgeInsets.all(4),
           sliver: SliverToBoxAdapter(
-            child: NotLazyPinterestListWidget<T>(
-              items: items,
+            child: NotLazyPinterestListWidget(
+              itemCount: itemCount,
               itemBuilder: itemBuilder!,
               crossAxisCount: crossAxisCount,
               mainAxisSpacing: mainAxisSpacing ?? kDefaultMainAxisSpacing,
@@ -54,6 +71,7 @@ class PinterestLayout<T> extends BaseResponsiveLayout<T> {
               buildAnimatedItem: buildAnimatedItem,
               calculateAnimationIndex: calculateAnimationIndex,
               onLoadingProgress: onLoadingProgress,
+              cacheChildren: cacheChildren,
             ),
           ),
         ),

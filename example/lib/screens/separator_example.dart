@@ -138,7 +138,7 @@ class _SeparatorExampleState extends State<SeparatorExample> {
                         Divider(thickness: 2, height: 2),
                     crossAxisSeparator: (columnIndex, totalColumns) =>
                         VerticalDivider(thickness: 2, width: 2),
-                    items: posts,
+                    itemCount: posts.length,
                     itemBuilder: (context, index) {
                       final item = posts[index];
 

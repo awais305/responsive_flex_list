@@ -27,11 +27,11 @@ import 'package:responsive_flex_list/src/widgets/base_responsive_widget.dart';
 ///   ],
 /// )
 ///
-/// // With builder masonry
+/// // With builder
 /// ResponsiveFlexList.builder(
-///   items: myDataList,
-///   itemBuilder: (item, index) => Card(
-///     child: Text('Item ${item.name}'),
+///   itemCount: myDataList.length,
+///   itemBuilder: (context, index) => Card(
+///     child: Text('Item ${myDataList[index].name}'),
 ///   ),
 /// )
 ///
@@ -106,6 +106,8 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.mainAxisSpacing,
     super.customAnimationBuilder,
     super.rtlOptions = RTLOptions.defaults,
+    super.minCrossAxisCount,
+    super.maxCrossAxisCount,
   })  : assert(
           animationDuration == null ||
               (animationType != ResponsiveAnimationType.none ||
@@ -113,7 +115,7 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
           'animationDuration cannot be used with $animationType',
         ),
         super(
-          items: const [],
+          itemCount: 0,
           itemBuilder: null,
           mainAxisSeparator: null,
           crossAxisSeparator: null,
@@ -129,17 +131,17 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
   ///
   /// This constructor is ideal when you have a list of data that needs to be
   /// converted into widgets. The [itemBuilder] function will be called for
-  /// each item in the [items] list.
+  /// each item up to [itemCount].
   ///
-  /// The [items] and [itemBuilder] parameters are required.
+  /// The [itemCount] and [itemBuilder] parameters are required.
   ///
   /// Example:
   /// ```dart
   /// ResponsiveFlexList.builder(
-  ///   items: ['Apple', 'Banana', 'Cherry'],
-  ///   itemBuilder: (fruit, index) => Card(
+  ///   itemCount: fruits.length,
+  ///   itemBuilder: (context, index) => Card(
   ///     child: ListTile(
-  ///       title: Text(fruit ?? 'Empty'),
+  ///       title: Text(fruits[index]),
   ///       subtitle: Text('Index: $index'),
   ///     ),
   ///   ),
@@ -147,8 +149,9 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
   /// ```
   const ResponsiveFlexList.builder({
     super.key,
-    required super.items,
-    required super.itemBuilder,
+    super.itemCount,
+    super.itemBuilder,
+    @Deprecated('Use itemCount instead') super.items,
     super.crossAxisCount,
     super.padding,
     super.physics,
@@ -166,8 +169,10 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.maxStaggeredItems,
     super.customAnimationBuilder,
     super.rtlOptions = RTLOptions.defaults,
-    super.mainAxisSpacing = 10,
-    super.crossAxisSpacing = 10,
+    super.mainAxisSpacing = kDefaultMainAxisSpacing,
+    super.crossAxisSpacing = kDefaultCrossAxisSpacing,
+    super.minCrossAxisCount,
+    super.maxCrossAxisCount,
   })  : assert(
           animationDuration == null ||
               (animationType != ResponsiveAnimationType.none ||
@@ -192,21 +197,22 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
   /// separators between each row of items. This is useful when you want
   /// visual separation between rows.
   ///
-  /// The [items] and [itemBuilder] parameters are required.
+  /// The [itemCount] and [itemBuilder] parameters are required.
   ///
   /// Example:
   /// ```dart
   /// ResponsiveFlexList.withSeparators(
-  ///   items: myProducts,
-  ///   itemBuilder: (product, index) => ProductCard(product: product),
-  ///   mainAxisSeparator: Divider(thickness: 2),
-  ///   crossAxisSeparator: VerticalDivider(thickness: 1),
+  ///   itemCount: myProducts.length,
+  ///   itemBuilder: (context, index) => ProductCard(product: myProducts[index]),
+  ///   mainAxisSeparator: (index, count) => Divider(thickness: 2),
+  ///   crossAxisSeparator: (index, count) => VerticalDivider(thickness: 1),
   /// )
   /// ```
   const ResponsiveFlexList.withSeparators({
     super.key,
-    required super.items,
-    required super.itemBuilder,
+    super.itemCount,
+    super.itemBuilder,
+    @Deprecated('Use itemCount instead') super.items,
     required super.mainAxisSeparator,
     required super.crossAxisSeparator,
     super.crossAxisCount,
@@ -230,6 +236,8 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.useIntrinsicHeight = false,
     super.maxRowHeight,
     super.roundRobinLayout = false,
+    super.minCrossAxisCount,
+    super.maxCrossAxisCount,
   }) : super(
           children: const [],
           mainAxisSpacing: 10,

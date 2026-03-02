@@ -7,7 +7,7 @@ import 'package:responsive_flex_list/src/layouts/round_robin_layout.dart';
 /// Supports two rendering modes: adaptive height mode using RoundRobinLayout for dynamic
 /// item distribution, or fixed height mode using CustomScrollView for efficient sliver-based rendering.
 /// Ideal for lists where visual separation between items is important.
-class WithSeparatorLayout<T> extends BaseResponsiveLayout<T> {
+class WithSeparatorLayout extends BaseResponsiveLayout {
   /// Enables newspaper-style column layout that distributes items naturally
   /// across columns, eliminating white gaps for balanced visual presentation.
   final bool roundRobinLayout;
@@ -15,7 +15,7 @@ class WithSeparatorLayout<T> extends BaseResponsiveLayout<T> {
   const WithSeparatorLayout({
     super.key,
     super.listKey,
-    required super.items,
+    required super.itemCount,
     super.itemBuilder,
     required super.crossAxisCount,
     super.padding,
@@ -40,6 +40,7 @@ class WithSeparatorLayout<T> extends BaseResponsiveLayout<T> {
     required super.maxStaggeredItems,
     super.customAnimationBuilder,
     super.maxRowHeight,
+    super.items,
   });
 
   @override
@@ -51,6 +52,11 @@ class WithSeparatorLayout<T> extends BaseResponsiveLayout<T> {
     // Use RoundRobinLayout for adaptive heights to distribute items evenly across columns
     if (roundRobinLayout) {
       return RoundRobinLayout(
+        // forward scroll-level properties so physics/controller actually work
+        physics: physics,
+        controller: controller,
+        primary: primary,
+        cacheExtent: cacheExtent,
         reverse: reverse,
         shrinkWrap: shrinkWrap,
         crossAxisSeparator: crossAxisSeparator,
@@ -60,7 +66,7 @@ class WithSeparatorLayout<T> extends BaseResponsiveLayout<T> {
         crossAxisSpacing: crossAxisSpacing,
         maxStaggeredItems: maxStaggeredItems,
         crossAxisCount: crossAxisCount,
-        items: items,
+        itemCount: itemCount,
         itemBuilder: itemBuilder,
         isRTL: isRTL,
         useIntrinsicHeight: useIntrinsicHeight,
@@ -88,7 +94,7 @@ class WithSeparatorLayout<T> extends BaseResponsiveLayout<T> {
             delegate: SliverChildBuilderDelegate(
               // Build each row with separators between items
               (context, index) => buildRowWithSeparator(
-                totalRows: (items.length / crossAxisCount).ceil(),
+                totalRows: (itemCount / crossAxisCount).ceil(),
                 rowIndex: index,
                 isWhiteSpaceDivider: false,
               ),

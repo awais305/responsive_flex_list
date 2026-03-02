@@ -80,7 +80,7 @@ class CustomBreakpointsExample extends StatelessWidget {
                     child: FadeTransition(opacity: animation, child: child),
                   );
                 },
-                items: List.generate(20, (index) => 'Item ${index + 1}'),
+                itemCount: 20,
                 breakpoints: customBreakpoints,
                 itemBuilder: (context, index) {
                   final item = 'Item ${index + 1}';

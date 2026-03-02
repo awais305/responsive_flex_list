@@ -5,52 +5,79 @@ import 'package:responsive_flex_list/src/widgets/list_animations.dart';
 
 /// Base class for all responsive widgets (List and Masonry).
 ///
-class BaseResponsiveWidget<T> extends StatefulWidget {
-  const BaseResponsiveWidget(
-      {super.key,
-      required this.children,
-      required this.items,
-      required this.itemBuilder,
-      required this.type,
-      this.crossAxisCount,
-      this.padding,
-      this.physics,
-      this.controller,
-      this.mainAxisSeparator,
-      this.crossAxisSeparator,
-      this.mainAxisSpacing,
-      this.crossAxisSpacing,
-      this.shrinkWrap = false,
-      this.reverse = false,
-      this.primary,
-      this.cacheExtent,
-      this.breakpoints,
-      this.animationDuration,
-      this.animationCurve,
-      this.animationType = kDefaultResponsiveAnimationType,
-      this.animationFlow = kDefaultAnimationFlow,
-      this.staggerDelay = kDefaultStaggerDelay,
-      this.maxStaggeredItems,
-      this.customAnimationBuilder,
-      this.rtlOptions = RTLOptions.defaults,
-      this.mainAxisSeparatorMode = kDefaultMainAxisSeparatorMode,
-      this.useIntrinsicHeight = false,
-      this.roundRobinLayout = false,
-      this.maxRowHeightMultiplier = 1,
-      this.maxRowHeight,
-      this.onLoadingProgress});
+class BaseResponsiveWidget extends StatefulWidget {
+  const BaseResponsiveWidget({
+    super.key,
+    required this.children,
+    required this.itemBuilder,
+    required this.type,
+    int? itemCount,
+    this.crossAxisCount,
+    this.padding,
+    this.physics,
+    this.controller,
+    this.mainAxisSeparator,
+    this.crossAxisSeparator,
+    this.mainAxisSpacing,
+    this.crossAxisSpacing,
+    this.shrinkWrap = false,
+    this.reverse = false,
+    this.primary,
+    this.cacheExtent,
+    this.breakpoints,
+    this.animationDuration,
+    this.animationCurve,
+    this.animationType = kDefaultResponsiveAnimationType,
+    this.animationFlow = kDefaultAnimationFlow,
+    this.staggerDelay = kDefaultStaggerDelay,
+    this.maxStaggeredItems,
+    this.customAnimationBuilder,
+    this.rtlOptions = RTLOptions.defaults,
+    this.mainAxisSeparatorMode = kDefaultMainAxisSeparatorMode,
+    this.useIntrinsicHeight = false,
+    this.roundRobinLayout = false,
+    this.maxRowHeightMultiplier = 1,
+    this.maxRowHeight,
+    this.onLoadingProgress,
+    this.cacheChildren = true,
+    this.minCrossAxisCount,
+    this.maxCrossAxisCount,
+    @Deprecated(
+        'Use itemCount instead. If provided, itemCount will be items.length.')
+    this.items,
+  }) : itemCount = itemCount ?? items?.length ?? 0;
 
   /// Fixed number of columns. If null, determined automatically based on breakpoints.
   final int? crossAxisCount;
 
+  /// Minimum number of columns to display.
+  ///
+  /// e.g.
+  /// minCrossAxisCount: 2
+  ///
+  /// -> At least 2 columns even on small phones
+  final int? minCrossAxisCount;
+
+  /// Maximum number of columns to display.
+  ///
+  /// e.g.
+  /// maxCrossAxisCount: 4
+  ///
+  /// -> At most 4 columns even on ultra-wide screens
+  final int? maxCrossAxisCount;
+
   /// List of pre-built child widgets for the children constructor.
   final List<Widget> children;
 
-  /// List of data items to be displayed with the builder constructor.
-  final List<T> items;
+  /// Number of items to be displayed.
+  final int itemCount;
 
   /// Builder function that creates widgets from data items.
-  final ItemBuilder<T>? itemBuilder;
+  final ItemBuilder? itemBuilder;
+
+  /// [Deprecated] Use [itemCount] instead.
+  @Deprecated('Use itemCount instead')
+  final List? items;
 
   /// Padding around the list content. Automatically flipped for RTL layouts.
   final EdgeInsets? padding;
@@ -151,13 +178,20 @@ class BaseResponsiveWidget<T> extends StatefulWidget {
   /// include images.
   final void Function(int loaded, int total)? onLoadingProgress;
 
+  /// When set to `false`, Pinterest layout will not cache its built children.
+  ///
+  /// Defaults to true for backward compatibility. Turning caching off forces
+  /// the masonry widget to rebuild every item on each build pass, which is
+  /// useful when the items are expected to change frequently or when you
+  /// want to avoid holding a large list in memory.
+  final bool cacheChildren;
+
   @override
-  State<BaseResponsiveWidget<T>> createState() =>
-      BaseResponsiveWidgetState<T>();
+  State<BaseResponsiveWidget> createState() => BaseResponsiveWidgetState();
 }
 
 /// Shared state logic managing responsive behavior, animations, and layout calculations.
-class BaseResponsiveWidgetState<T> extends State<BaseResponsiveWidget<T>> {
+class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
   /// Current number of columns being displayed based on screen width.
   late int crossAxisCount;
 
@@ -181,11 +215,11 @@ class BaseResponsiveWidgetState<T> extends State<BaseResponsiveWidget<T>> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    maxStaggeredItems = _getMaxStaggeredItems();
+    // Initial calculation will happen in build/LayoutBuilder
   }
 
   @override
-  void didUpdateWidget(BaseResponsiveWidget<T> oldWidget) {
+  void didUpdateWidget(BaseResponsiveWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     // Trigger animations when layout configuration changes
@@ -208,10 +242,12 @@ class BaseResponsiveWidgetState<T> extends State<BaseResponsiveWidget<T>> {
     Widget child = LayoutBuilder(
       builder: (context, constraints) {
         crossAxisCount = _getcrossAxisCount(constraints);
+        maxStaggeredItems = _getMaxStaggeredItems(crossAxisCount);
 
         return buildAnimatedLayout(
           key: ValueKey('$_currentAnimationType'),
           crossAxisCount: crossAxisCount,
+          maxStaggeredItems: maxStaggeredItems,
           isRTL: _isRTL,
         );
       },
@@ -232,12 +268,13 @@ class BaseResponsiveWidgetState<T> extends State<BaseResponsiveWidget<T>> {
   Widget buildAnimatedLayout({
     required Key key,
     required int crossAxisCount,
+    required int maxStaggeredItems,
     required bool isRTL,
   }) {
-    return ListAnimations<T>(
+    return ListAnimations(
       key: key,
       type: widget.type,
-      items: widget.items,
+      itemCount: widget.itemCount,
       crossAxisCount: crossAxisCount,
       itemBuilder: widget.itemBuilder,
       padding: isRTL ? widget.padding?.flipped : widget.padding,
@@ -267,6 +304,8 @@ class BaseResponsiveWidgetState<T> extends State<BaseResponsiveWidget<T>> {
       roundRobinLayout: widget.roundRobinLayout,
       maxRowHeight: widget.maxRowHeight,
       onLoadingProgress: widget.onLoadingProgress,
+      cacheChildren: widget.cacheChildren,
+      items: widget.items,
       children: widget.children,
     );
   }
@@ -298,52 +337,44 @@ class BaseResponsiveWidgetState<T> extends State<BaseResponsiveWidget<T>> {
     final points = widget.breakpoints ??
         ResponsiveConfig.breakpoints.mergeWith(widget.breakpoints);
 
+    int count;
     if (points.largeDesktop != null && screenWidth >= points.largeDesktop!) {
-      return points.largeDesktopColumns;
+      count = points.largeDesktopColumns;
     } else if (points.desktop != null && screenWidth >= points.desktop!) {
-      return points.desktopColumns;
+      count = points.desktopColumns;
     } else if (points.laptop != null && screenWidth >= points.laptop!) {
-      return points.laptopColumns;
+      count = points.laptopColumns;
     } else if (points.tablet != null && screenWidth >= points.tablet!) {
-      return points.tabletColumns;
+      count = points.tabletColumns;
     } else if (points.smallTablet != null &&
         screenWidth >= points.smallTablet!) {
-      return points.smallTabletColumns;
+      count = points.smallTabletColumns;
     } else if (points.mobile != null && screenWidth >= points.mobile!) {
-      return points.mobileColumns;
+      count = points.mobileColumns;
     } else {
-      return points.smallMobileColumns;
+      count = points.smallMobileColumns;
     }
+
+    // Apply min/max boundaries
+    if (widget.minCrossAxisCount != null) {
+      count = count.clamp(widget.minCrossAxisCount!, double.infinity).toInt();
+    }
+    if (widget.maxCrossAxisCount != null) {
+      count = count.clamp(0, widget.maxCrossAxisCount!).toInt();
+    }
+
+    return count;
   }
 
-  /// Calculates max staggered items based on screen size for optimal performance.
-  int _getMaxStaggeredItems() {
+  /// Calculates max staggered items based on current layout for optimal performance.
+  /// Ensures all initial items in the viewport are animated.
+  int _getMaxStaggeredItems(int currentColumns) {
     if (widget.maxStaggeredItems != null) {
       return widget.maxStaggeredItems!;
     }
 
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final points = widget.breakpoints ??
-        ResponsiveConfig.breakpoints.mergeWith(widget.breakpoints);
-
-    if (points.largeDesktop != null && screenWidth >= points.largeDesktop!) {
-      return 60;
-    } else if (points.desktop != null && screenWidth >= points.desktop!) {
-      return 40;
-    } else if (points.laptop != null && screenWidth >= points.laptop!) {
-      return 30;
-    } else if (points.tablet != null && screenWidth >= points.tablet!) {
-      return 20;
-    } else if (points.smallTablet != null &&
-        screenWidth >= points.smallTablet!) {
-      return 15;
-    } else if (points.mobile != null && screenWidth >= points.mobile!) {
-      return 10;
-    } else if (points.smallMobile != null &&
-        screenWidth >= points.smallMobile!) {
-      return 10;
-    } else {
-      return kDefaultMaxStaggeredItems;
-    }
+    // Aim for roughly 6-10 rows of items to animate
+    // This ensures full-screen coverage on most devices
+    return (currentColumns * 8).clamp(kDefaultMaxStaggeredItems, 100);
   }
 }

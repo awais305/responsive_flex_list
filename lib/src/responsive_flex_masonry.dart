@@ -25,7 +25,7 @@ import 'package:responsive_flex_list/src/widgets/base_responsive_widget.dart';
 /// - Automatically handles responsiveness for different screen widths.
 /// - Includes animations out of the box (no controllers needed).
 
-class ResponsiveFlexMasonry<T> extends BaseResponsiveWidget<T> {
+class ResponsiveFlexMasonry extends BaseResponsiveWidget {
   /// A masonry layout inspired by Instagram's Explore page.
   ///
   /// Useful for:
@@ -37,8 +37,9 @@ class ResponsiveFlexMasonry<T> extends BaseResponsiveWidget<T> {
   ///
   const ResponsiveFlexMasonry.instagram({
     super.key,
-    required super.items,
-    required super.itemBuilder,
+    super.itemCount,
+    super.itemBuilder,
+    @Deprecated('Use itemCount instead') super.items,
     super.maxRowHeightMultiplier = 1,
     super.crossAxisCount,
     super.padding,
@@ -59,6 +60,8 @@ class ResponsiveFlexMasonry<T> extends BaseResponsiveWidget<T> {
     super.rtlOptions = RTLOptions.defaults,
     super.mainAxisSpacing = 1,
     super.crossAxisSpacing = 1,
+    super.minCrossAxisCount,
+    super.maxCrossAxisCount,
   })  : assert(
           animationDuration == null ||
               (animationType != ResponsiveAnimationType.none ||
@@ -84,8 +87,9 @@ class ResponsiveFlexMasonry<T> extends BaseResponsiveWidget<T> {
   ///
   const ResponsiveFlexMasonry.pinterest({
     super.key,
-    required super.items,
-    required super.itemBuilder,
+    super.itemCount,
+    super.itemBuilder,
+    @Deprecated('Use itemCount instead') super.items,
     super.crossAxisCount,
     super.padding,
     super.physics,
@@ -106,6 +110,9 @@ class ResponsiveFlexMasonry<T> extends BaseResponsiveWidget<T> {
     super.mainAxisSpacing = 15,
     super.crossAxisSpacing = 10,
     super.onLoadingProgress,
+    super.cacheChildren,
+    super.minCrossAxisCount,
+    super.maxCrossAxisCount,
   })  : assert(
           animationDuration == null ||
               (animationType != ResponsiveAnimationType.none ||

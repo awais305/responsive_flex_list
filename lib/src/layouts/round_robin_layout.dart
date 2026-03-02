@@ -7,12 +7,16 @@ import 'package:responsive_flex_list/src/layouts/base_responsive_layout.dart';
 /// Items are distributed column by column in a round-robin fashion (item 0 goes to column 0,
 /// item 1 to column 1, etc.). Best for scenarios where items should be evenly distributed
 /// across columns without height balancing.
-class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
+class RoundRobinLayout extends BaseResponsiveLayout {
   /// Whether to hide all separators and use spacing instead.
   final bool hideSeparators;
 
   const RoundRobinLayout({
     super.key,
+    super.physics,
+    super.controller,
+    super.primary,
+    super.cacheExtent,
     super.crossAxisSpacing,
     super.padding,
     super.crossAxisSeparator,
@@ -20,8 +24,8 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
     required super.mainAxisSeparator,
     required super.maxStaggeredItems,
     required super.crossAxisCount,
-    required super.items,
-    required super.itemBuilder,
+    required super.itemCount,
+    super.itemBuilder,
     required super.isRTL,
     this.hideSeparators = false,
     required super.useIntrinsicHeight,
@@ -32,14 +36,15 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
     super.customAnimationBuilder,
     required super.shrinkWrap,
     required super.reverse,
+    super.items,
   });
 
   @override
   Widget buildLayout(BuildContext context) {
     // Performance warning for large lists with IntrinsicHeight
-    if (useIntrinsicHeight && items.length > 100) {
+    if (useIntrinsicHeight && itemCount > 100) {
       debugPrint(
-        '⚠️ WARNING: IntrinsicHeight with ${items.length} items will cause '
+        '⚠️ WARNING: IntrinsicHeight with $itemCount items will cause '
         'severe performance issues. Consider setting useIntrinsicHeight=false',
       );
     }
@@ -76,7 +81,7 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
 
   /// Builds all columns with items distributed in round-robin fashion.
   List<Widget> _buildAllColumns(BuildContext context) {
-    if (items.isEmpty) return [];
+    if (itemCount == 0) return [];
 
     final List<Widget> columns = [];
 
@@ -86,14 +91,13 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
 
       // Add vertical separator between columns
       if (columnIndex < crossAxisCount - 1) {
-        final T? nextItem =
-            items.length > columnIndex + 1 ? items[columnIndex + 1] : null;
+        final bool isNextEmpty = itemCount <= columnIndex + 1;
 
         columns.add(
           buildAnimatedItem(
             animationIndex: columnIndex,
             child: _buildCrossAxisSeparator(
-              isNextEmpty: nextItem == null,
+              isNextEmpty: isNextEmpty,
               crossAxisSeparator: hideSeparators
                   ? null
                   : buildDefaultCrossAxisSeparator(columnIndex, crossAxisCount),
@@ -109,31 +113,27 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
 
   /// Builds a single column with its assigned items from the round-robin distribution.
   Widget _buildSingleColumn(BuildContext context, int columnIndex) {
-    List<T> columnItems = [];
     List<int> globalIndices = [];
 
     // Collect items for this column (every nth item where n = crossAxisCount)
-    for (int i = columnIndex; i < items.length; i += crossAxisCount) {
-      columnItems.add(items[i]);
+    for (int i = columnIndex; i < itemCount; i += crossAxisCount) {
       globalIndices.add(i);
     }
 
     // Reverse items for RTL if needed
     if (isRTL && (rtlOptions.reverseList || !rtlOptions.reverseRowOrder)) {
-      columnItems = columnItems.reversed.toList();
       globalIndices = globalIndices.reversed.toList();
     }
 
     final List<Widget> columnChildren = [];
 
-    for (int itemIndex = 0; itemIndex < columnItems.length; itemIndex++) {
-      final T? item = columnItems[itemIndex];
-      final int globalIndex = globalIndices[itemIndex];
+    for (int i = 0; i < globalIndices.length; i++) {
+      final int globalIndex = globalIndices[i];
       final int rowIndex = globalIndex ~/ crossAxisCount;
-      final int totalRows = (items.length / crossAxisCount).ceil();
+      final int totalRows = (itemCount / crossAxisCount).ceil();
 
       final int animationIndex = calculateAnimationIndex(
-        itemIndex: itemIndex,
+        itemIndex: i,
         rowIndex: rowIndex,
         columnIndex: columnIndex,
       );
@@ -142,14 +142,12 @@ class RoundRobinLayout<T> extends BaseResponsiveLayout<T> {
       columnChildren.add(
         buildAnimatedItem(
           animationIndex: animationIndex,
-          child: item == null
-              ? const SizedBox.shrink()
-              : itemBuilder!(context, globalIndex),
+          child: itemBuilder!(context, globalIndex),
         ),
       );
 
       // Add horizontal separator between items
-      if (itemIndex < columnItems.length - 1) {
+      if (i < globalIndices.length - 1) {
         final double leftPadding = columnIndex == 0
             ? 0
             : (crossAxisSpacing ?? kDefaultCrossAxisSpacing);

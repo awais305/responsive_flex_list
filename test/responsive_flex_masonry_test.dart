@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:responsive_flex_list/responsive_flex_list.dart';
+import 'package:responsive_flex_list/src/widgets/flex_empty_state.dart';
 
 void main() {
   setUpAll(
@@ -12,7 +13,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => Text('Item ${items[index]}'),
           ),
         ),
@@ -29,7 +30,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => SizedBox(
               key: ValueKey('item-${items[index]}'),
               height: 100,
@@ -47,7 +48,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => Text('Item ${items[index]}'),
             mainAxisSpacing: 20,
             crossAxisSpacing: 15,
@@ -64,7 +65,7 @@ void main() {
       final items = const [1, 2, 3];
       expect(
         () => ResponsiveFlexMasonry.instagram(
-          items: items,
+          itemCount: items.length,
           itemBuilder: (context, index) => Text('Item ${items[index]}'),
           animationDuration: const Duration(milliseconds: 300),
           animationType: ResponsiveAnimationType.none,
@@ -78,7 +79,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => Text('Item ${items[index]}'),
             animationDuration: const Duration(milliseconds: 300),
             animationType: ResponsiveAnimationType.fade,
@@ -87,6 +88,7 @@ void main() {
       );
 
       expect(find.byType(ResponsiveFlexMasonry), findsOneWidget);
+      await tester.pumpAndSettle();
     });
 
     testWidgets('builds with RTL options', (tester) async {
@@ -94,7 +96,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => Text('Item ${items[index]}'),
             rtlOptions:
                 const RTLOptions(mirrorAnimations: true, reverseRowOrder: true),
@@ -103,6 +105,7 @@ void main() {
       );
 
       expect(find.byType(ResponsiveFlexMasonry), findsOneWidget);
+      await tester.pumpAndSettle();
     });
   });
 
@@ -112,7 +115,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => SizedBox(
               height: 100.0 * items[index], // Varying heights for masonry
               child: Text('Item ${items[index]}'),
@@ -120,6 +123,9 @@ void main() {
           ),
         ),
       );
+
+      // children are built in post-frame callback, so wait for settle
+      await tester.pumpAndSettle();
 
       expect(find.text('Item 1'), findsOneWidget);
       expect(find.text('Item 4'), findsOneWidget);
@@ -131,13 +137,14 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => Text('Item ${items[index]}'),
           ),
         ),
       );
 
       expect(find.byType(ResponsiveFlexMasonry), findsOneWidget);
+      await tester.pumpAndSettle();
     });
 
     testWidgets('handles empty items list', (tester) async {
@@ -145,14 +152,61 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => const Text('Item'),
           ),
         ),
       );
 
       expect(find.byType(ResponsiveFlexMasonry), findsOneWidget);
-      expect(find.byType(Text), findsNothing);
+      expect(find.byType(FlexEmptyState), findsOneWidget);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('cacheChildren flag controls rebuilds', (tester) async {
+      int buildCount = 0;
+
+      // Helper stateful wrapper to force rebuilds via tap
+      Widget makeApp({required bool cacheChildren}) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return MaterialApp(
+              home: GestureDetector(
+                onTap: () => setState(() {}),
+                child: ResponsiveFlexMasonry.pinterest(
+                  itemCount: 2,
+                  itemBuilder: (context, index) {
+                    buildCount++;
+                    return Text('Item $index');
+                  },
+                  cacheChildren: cacheChildren,
+                ),
+              ),
+            );
+          },
+        );
+      }
+
+      // first with caching disabled
+      buildCount = 0;
+      await tester.pumpWidget(makeApp(cacheChildren: false));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(2));
+
+      // trigger rebuild
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pump();
+      expect(buildCount, equals(4));
+
+      // now enable caching
+      buildCount = 0;
+      await tester.pumpWidget(makeApp(cacheChildren: true));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(2));
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pump();
+      // builder should not run again when cache is on
+      expect(buildCount, equals(2));
     });
 
     testWidgets('onLoadingProgress callback can be provided', (tester) async {
@@ -163,7 +217,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: imagesWithCaptions,
+            itemCount: imagesWithCaptions.length,
             itemBuilder: (context, index) {
               final item = imagesWithCaptions[index];
               return Column(
@@ -206,7 +260,7 @@ void main() {
         MaterialApp(
           home: SingleChildScrollView(
             child: ResponsiveFlexMasonry.pinterest(
-              items: items,
+              itemCount: items.length,
               itemBuilder: (context, index) => Text('Item ${items[index]}'),
               shrinkWrap: true,
             ),
@@ -215,6 +269,7 @@ void main() {
       );
 
       expect(find.byType(ResponsiveFlexMasonry), findsOneWidget);
+      await tester.pumpAndSettle();
     });
   });
 
@@ -224,7 +279,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.instagram(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => const Text('Single Item'),
           ),
         ),
@@ -238,7 +293,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
-            items: items,
+            itemCount: items.length,
             itemBuilder: (context, index) => Text('Item ${items[index]}'),
             crossAxisCount: 3,
             padding: const EdgeInsets.all(16),
@@ -254,6 +309,7 @@ void main() {
       );
 
       expect(find.byType(ResponsiveFlexMasonry), findsOneWidget);
+      await tester.pumpAndSettle();
     });
   });
 }

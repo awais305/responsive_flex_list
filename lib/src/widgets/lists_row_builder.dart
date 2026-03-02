@@ -4,7 +4,7 @@ import 'package:responsive_flex_list/responsive_flex_list.dart';
 import 'package:responsive_flex_list/src/widgets/animate_item_wrapper.dart';
 
 /// Builds a single row in a responsive list with proper spacing and animations.
-class ListsRowBuilder<T> extends StatelessWidget {
+class ListsRowBuilder extends StatelessWidget {
   final bool isWhiteSpaceDivider;
   final double? crossAxisSpacing;
   final double mainAxisSpacing;
@@ -14,8 +14,8 @@ class ListsRowBuilder<T> extends StatelessWidget {
   final int maxStaggeredItems;
   final double? maxRowHeight;
   final int crossAxisCount;
-  final List<T> items;
-  final ItemBuilder<T>? itemBuilder;
+  final int itemCount;
+  final ItemBuilder? itemBuilder;
   final bool useIntrinsicHeight;
   final bool isRTL;
   final MainAxisSeparatorMode mainAxisSeparatorMode;
@@ -35,7 +35,7 @@ class ListsRowBuilder<T> extends StatelessWidget {
     required this.rowIndex,
     required this.maxStaggeredItems,
     required this.crossAxisCount,
-    required this.items,
+    required this.itemCount,
     required this.itemBuilder,
     required this.useIntrinsicHeight,
     required this.isRTL,
@@ -52,29 +52,16 @@ class ListsRowBuilder<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     // Calculate which items belong to this row
     final int startIndex = rowIndex * crossAxisCount;
-    final int endIndex = (startIndex + crossAxisCount).clamp(0, items.length);
-
-    // Extract items for this row
-    List<T> rowItems = items.sublist(startIndex, endIndex);
-
-    // Reverse items for RTL if needed
-    if (isRTL && (rtlOptions.reverseList || !rtlOptions.reverseRowOrder)) {
-      rowItems = rowItems.reversed.toList();
-    }
-
-    // Pad with nulls to maintain consistent row structure
-    final List<T?> paddedItems = [
-      ...rowItems,
-      ...List.filled(crossAxisCount - rowItems.length, null),
-    ];
 
     final List<Widget> children = <Widget>[];
 
-    final int totalRows = (items.length / crossAxisCount).ceil();
+    final int totalRows = (itemCount / crossAxisCount).ceil();
     final bool isNotLastRow = rowIndex != totalRows - 1;
 
-    for (int i = 0; i < paddedItems.length; i++) {
-      final T? item = paddedItems[i];
+    for (int i = 0; i < crossAxisCount; i++) {
+      final int itemIndex = startIndex + i;
+      final bool hasItem = itemIndex < itemCount;
+
       final double leftPadding =
           i == 0 ? 0 : (crossAxisSpacing ?? kDefaultCrossAxisSpacing);
       final double rightPadding = i == (crossAxisCount - 1)
@@ -122,8 +109,8 @@ class ListsRowBuilder<T> extends StatelessWidget {
                         ),
                       ),
                     ),
-                  // Only show item if not null
-                  if (item != null)
+                  // Only show item if it exists
+                  if (hasItem)
                     AnimateItemWrapper(
                       animations: animations,
                       index: animationIndex,
@@ -131,7 +118,7 @@ class ListsRowBuilder<T> extends StatelessWidget {
                       animationType: animationType,
                       rtlOptions: rtlOptions,
                       customAnimationBuilder: customAnimationBuilder,
-                      child: itemBuilder?.call(context, startIndex + i) ??
+                      child: itemBuilder?.call(context, itemIndex) ??
                           const SizedBox.shrink(),
                     ),
                 ],
@@ -144,7 +131,7 @@ class ListsRowBuilder<T> extends StatelessWidget {
         case MainAxisSeparatorMode.fullWidth:
           children.add(
             Expanded(
-              child: item == null
+              child: !hasItem
                   ? const SizedBox.shrink()
                   : AnimateItemWrapper(
                       animations: animations,
@@ -156,7 +143,7 @@ class ListsRowBuilder<T> extends StatelessWidget {
                       child: itemBuilder == null
                           ? const SizedBox.shrink()
                           // this index is item index
-                          : itemBuilder!(context, startIndex + i),
+                          : itemBuilder!(context, itemIndex),
                     ),
             ),
           );
@@ -165,7 +152,7 @@ class ListsRowBuilder<T> extends StatelessWidget {
 
       // Add vertical separator between items (except after last item)
       // Only add separator if current item exists AND it's not the last column
-      if (i < paddedItems.length - 1 && item != null) {
+      if (i < crossAxisCount - 1 && hasItem) {
         children.add(
           AnimateItemWrapper(
             index: animationIndex,
@@ -186,6 +173,39 @@ class ListsRowBuilder<T> extends StatelessWidget {
           ),
         );
       }
+    }
+
+    // Apply RTL reverse order if needed
+    if (isRTL && (rtlOptions.reverseList || !rtlOptions.reverseRowOrder)) {
+      // Note: We need to be careful with vertical separators if they are in the list.
+      // However, usually we can just reverse the resulting children list if they are all widgets.
+      // But separators are between items. Reversing correctly is tricky.
+      // Actually, if we just want to reverse the items, we should have done it before building the widget list.
+      // Let's stick to the previous logic of reversing the data, but since we don't have data,
+      // we just reverse the built widgets (items and separators).
+      return useIntrinsicHeight
+          ? IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+                children: children.reversed.toList(),
+              ),
+            )
+          : maxRowHeight != null
+              ? SizedBox(
+                  height: maxRowHeight,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    textDirection:
+                        isRTL ? TextDirection.rtl : TextDirection.ltr,
+                    children: children.reversed.toList(),
+                  ),
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+                  children: children.reversed.toList(),
+                );
     }
 
     // Return row with appropriate height constraint

@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 /// - [index]: The position of the item in the list
 ///
 /// Should return the widget to display
-typedef ItemBuilder<T> = Widget Function(BuildContext context, int index);
+typedef ItemBuilder = Widget Function(BuildContext context, int index);
 
 typedef SeparatorBuilder = Widget Function(int index, int total);
 

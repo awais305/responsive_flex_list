@@ -11,7 +11,7 @@ import 'package:responsive_flex_list/src/layouts/base_responsive_layout.dart';
 /// - Social media feeds
 ///
 /// This layout adapts rows dynamically based on incoming data and screen size.
-class InstagramLayout<T> extends BaseResponsiveLayout<T> {
+class InstagramLayout extends BaseResponsiveLayout {
   /// Multiplier to determine row height relative to column width.
   /// For example, 1.5 means row height = column width * 1.5 * 2
   final double maxRowHeightMultiplier;
@@ -23,8 +23,8 @@ class InstagramLayout<T> extends BaseResponsiveLayout<T> {
     super.crossAxisSpacing,
     required super.mainAxisSpacing,
     required super.maxStaggeredItems,
-    required super.items,
-    required super.itemBuilder,
+    required super.itemCount,
+    super.itemBuilder,
     required super.isRTL,
     required super.rtlOptions,
     required super.animationFlow,
@@ -32,7 +32,10 @@ class InstagramLayout<T> extends BaseResponsiveLayout<T> {
     required super.animationType,
     super.customAnimationBuilder,
     super.padding,
-  }) : super(shrinkWrap: false, reverse: false, useIntrinsicHeight: false);
+    super.items,
+    required super.shrinkWrap,
+    required super.reverse,
+  }) : super(useIntrinsicHeight: false);
 
   @override
   Widget buildLayout(BuildContext context) {
@@ -49,8 +52,8 @@ class InstagramLayout<T> extends BaseResponsiveLayout<T> {
         // Wrap the grid in SliverPadding to apply optional padding
         SliverPadding(
           padding: padding ?? EdgeInsets.zero,
-          sliver: SliverInstagramGrid<T>(
-            items: items,
+          sliver: SliverInstagramGrid(
+            itemCount: itemCount,
             itemBuilder: itemBuilder!,
             crossAxisCount: crossAxisCount,
             maxRowHeightMultiplier: maxRowHeightMultiplier,
@@ -68,12 +71,12 @@ class InstagramLayout<T> extends BaseResponsiveLayout<T> {
 
 /// Internal sliver implementation for Instagram-style grid layout.
 /// Handles the actual rendering of items in varied patterns.
-class SliverInstagramGrid<T> extends StatelessWidget {
-  /// List of data items to display
-  final List<T> items;
+class SliverInstagramGrid extends StatelessWidget {
+  /// Number of items to display
+  final int itemCount;
 
   /// Function to build each item widget
-  final ItemBuilder<T> itemBuilder;
+  final ItemBuilder itemBuilder;
 
   /// Number of columns in the grid
   final int crossAxisCount;
@@ -103,7 +106,7 @@ class SliverInstagramGrid<T> extends StatelessWidget {
 
   const SliverInstagramGrid({
     super.key,
-    required this.items,
+    required this.itemCount,
     required this.itemBuilder,
     required this.crossAxisCount,
     required this.maxRowHeightMultiplier,
@@ -170,13 +173,13 @@ class SliverInstagramGrid<T> extends StatelessWidget {
   /// Calculate total number of rows needed to display all items.
   /// Iterates through patterns to count how many items fit in each row.
   int _calculateRowCount(List<List<int>> patterns) {
-    if (items.isEmpty) return 0;
+    if (itemCount == 0) return 0;
 
     int itemIndex = 0;
     int rowCount = 0;
 
     // Keep adding rows until all items are accounted for
-    while (itemIndex < items.length) {
+    while (itemIndex < itemCount) {
       // Get pattern for current row (cycles through available patterns)
       final pattern = patterns[rowCount % patterns.length];
 
@@ -239,7 +242,7 @@ class SliverInstagramGrid<T> extends StatelessWidget {
           // Build each item in this column
           for (int i = 0; i < itemsInColumn; i++) {
             // Stop if we've run out of items
-            if (currentItemIndex >= items.length) break;
+            if (currentItemIndex >= itemCount) break;
 
             // final item = items[currentItemIndex];
 
@@ -259,7 +262,7 @@ class SliverInstagramGrid<T> extends StatelessWidget {
             );
 
             // Add spacing between stacked items (but not after last item)
-            if (i < itemsInColumn - 1 && currentItemIndex < items.length - 1) {
+            if (i < itemsInColumn - 1 && currentItemIndex < itemCount - 1) {
               columnChildren.add(SizedBox(height: mainAxisSpacing));
             }
 

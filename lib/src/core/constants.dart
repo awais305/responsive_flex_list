@@ -25,5 +25,5 @@ const MainAxisSeparatorMode kDefaultMainAxisSeparatorMode =
     MainAxisSeparatorMode.fullWidth;
 
 /// Default spacing values
-const double kDefaultMainAxisSpacing = 15.0;
-const double kDefaultCrossAxisSpacing = 15.0;
+const double kDefaultMainAxisSpacing = 10.0;
+const double kDefaultCrossAxisSpacing = 10.0;

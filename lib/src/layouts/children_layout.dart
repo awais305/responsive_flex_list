@@ -9,7 +9,7 @@ import 'package:responsive_flex_list/src/widgets/flex_empty_state.dart';
 /// a list of Widget children and arranges them in a responsive grid. Useful when you have
 /// pre-constructed widgets or when widget construction doesn't follow a simple data-to-widget pattern.
 /// Displays an empty state when no children are provided.
-class ChildrenLayout<T> extends BaseResponsiveLayout<T> {
+class ChildrenLayout extends BaseResponsiveLayout {
   /// Pre-built widgets to display in the grid layout.
   final List<Widget> children;
 
@@ -35,9 +35,9 @@ class ChildrenLayout<T> extends BaseResponsiveLayout<T> {
     required super.animationType,
     super.customAnimationBuilder,
     required this.children,
+    super.items,
   }) : super(
-          // Children layout doesn't use items and itemBuilder
-          items: const [],
+          itemCount: children.length,
           itemBuilder: null,
         );
 

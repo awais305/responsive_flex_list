@@ -9,12 +9,12 @@ import 'package:responsive_flex_list/src/core/core.dart';
 /// making it ideal for lists where all items need to be rendered immediately or when
 /// smooth scrolling with complex animations is required. Intelligently handles updates
 /// by appending only new items when possible, avoiding full rebuilds.
-class NotLazyPinterestListWidget<T> extends StatefulWidget {
-  /// List of data items to display in the masonry grid.
-  final List<T> items;
+class NotLazyPinterestListWidget extends StatefulWidget {
+  /// Number of items to display in the masonry grid.
+  final int itemCount;
 
   /// Builder function that creates a widget for each item.
-  final ItemBuilder<T> itemBuilder;
+  final ItemBuilder itemBuilder;
 
   /// Number of columns in the masonry grid.
   final int crossAxisCount;
@@ -43,13 +43,22 @@ class NotLazyPinterestListWidget<T> extends StatefulWidget {
   }) calculateAnimationIndex;
 
   /// Callback fired with progress updates as images load.
+  ///
   /// Receives (loadedCount, totalCount).
+  ///
   /// When loaded == total, all images are fully loaded and rendered.
   final void Function(int loaded, int total)? onLoadingProgress;
 
+  /// When `false`, items are rebuilt on every frame instead of being cached.
+  ///
+  /// The default (`true`) preserves previous behavior; disabling it is useful
+  /// when you have frequently changing item widgets or wish to reduce memory
+  /// usage at the expense of extra rebuilds.
+  final bool cacheChildren;
+
   const NotLazyPinterestListWidget({
     super.key,
-    required this.items,
+    required this.itemCount,
     required this.itemBuilder,
     required this.crossAxisCount,
     required this.mainAxisSpacing,
@@ -59,15 +68,16 @@ class NotLazyPinterestListWidget<T> extends StatefulWidget {
     required this.buildAnimatedItem,
     required this.calculateAnimationIndex,
     this.onLoadingProgress,
+    this.cacheChildren = true,
   });
 
   @override
-  State<NotLazyPinterestListWidget<T>> createState() =>
-      _NotLazyPinterestListWidgetState<T>();
+  State<NotLazyPinterestListWidget> createState() =>
+      _NotLazyPinterestListWidgetState();
 }
 
-class _NotLazyPinterestListWidgetState<T>
-    extends State<NotLazyPinterestListWidget<T>> {
+class _NotLazyPinterestListWidgetState
+    extends State<NotLazyPinterestListWidget> {
   /// Cached list of built widget children to avoid unnecessary rebuilds.
   List<Widget> _cachedChildren = [];
 
@@ -88,15 +98,17 @@ class _NotLazyPinterestListWidgetState<T>
   @override
   void initState() {
     super.initState();
-    _previousItemCount = widget.items.length;
+    _previousItemCount = widget.itemCount;
     _previousCrossAxisCount = widget.crossAxisCount;
-    // Build after first frame to allow initial render
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _buildChildrenList(0, _previousItemCount);
-        _startImageTracking();
-      }
-    });
+    if (widget.cacheChildren) {
+      // Build after first frame to allow initial render
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _buildChildrenList(0, _previousItemCount);
+          _startImageTracking();
+        }
+      });
+    }
   }
 
   /// Starts tracking image loading after layout
@@ -213,7 +225,10 @@ class _NotLazyPinterestListWidgetState<T>
   }
 
   /// Efficiently appends only newly added items to the cached children list.
+  ///
+  /// No-op when caching is disabled.
   void _appendNewItems(int startIndex, int endIndex) {
+    if (!widget.cacheChildren) return;
     final int count = endIndex - startIndex;
     final List<Widget> newWidgets = List.generate(
       count,
@@ -229,7 +244,10 @@ class _NotLazyPinterestListWidgetState<T>
   }
 
   /// Builds children list from startIndex to endIndex
+  ///
+  /// Only used when caching is enabled.
   void _buildChildrenList(int startIndex, int endIndex) {
+    if (!widget.cacheChildren) return;
     final int count = endIndex - startIndex;
     final List<Widget> newChildren = List.generate(
       count,
@@ -243,13 +261,23 @@ class _NotLazyPinterestListWidgetState<T>
   }
 
   @override
-  void didUpdateWidget(NotLazyPinterestListWidget<T> oldWidget) {
+  void didUpdateWidget(NotLazyPinterestListWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final int newLength = widget.items.length;
+    final int newLength = widget.itemCount;
     final bool columnCountChanged =
         _previousCrossAxisCount != widget.crossAxisCount;
     final bool itemsChanged = _previousItemCount != newLength;
+
+    // When caching disabled, force rebuild on any changes
+    if (!widget.cacheChildren) {
+      if (itemsChanged || columnCountChanged) {
+        _previousItemCount = newLength;
+        _previousCrossAxisCount = widget.crossAxisCount;
+        setState(() {});
+      }
+      return;
+    }
 
     // Early return if nothing changed
     if (!columnCountChanged && !itemsChanged) {
@@ -284,11 +312,9 @@ class _NotLazyPinterestListWidgetState<T>
 
   /// Builds a keyed widget for an item with animation wrapper.
   Widget _buildWidgetForItem(BuildContext context, int index) {
-    final item = widget.items[index];
-
     return KeyedSubtree(
-      // Unique key combining item and index for proper widget identity
-      key: ValueKey('${item}_$index'),
+      // Unique key for proper widget identity
+      key: ValueKey('pinterest_item_$index'),
       child: widget.buildAnimatedItem(
         animationIndex: widget.calculateAnimationIndex(
           itemIndex: index,
@@ -309,13 +335,20 @@ class _NotLazyPinterestListWidgetState<T>
 
   @override
   Widget build(BuildContext context) {
+    final children = widget.cacheChildren
+        ? _cachedChildren
+        : List.generate(
+            widget.itemCount,
+            (i) => _buildWidgetForItem(context, i),
+          );
+
     return RepaintBoundary(
       child: _PinterestRenderWidget(
         crossAxisCount: widget.crossAxisCount,
         mainAxisSpacing: widget.mainAxisSpacing,
         crossAxisSpacing: widget.crossAxisSpacing,
         textDirection: widget.textDirection,
-        children: _cachedChildren,
+        children: children,
       ),
     );
   }
