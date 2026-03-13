@@ -22,8 +22,10 @@ class ListsRowBuilder extends StatelessWidget {
   final RTLOptions rtlOptions;
   final AnimationFlow animationFlow;
   final List<Animation<double>> animations;
-  final ResponsiveAnimationType animationType;
+  final AnimationType animationType;
   final CustomAnimationBuilder? customAnimationBuilder;
+  final double? childAspectRatio;
+  final double? mainAxisExtent;
 
   const ListsRowBuilder({
     super.key,
@@ -46,6 +48,8 @@ class ListsRowBuilder extends StatelessWidget {
     required this.animationType,
     this.maxRowHeight,
     this.customAnimationBuilder,
+    this.childAspectRatio,
+    this.mainAxisExtent,
   });
 
   @override
@@ -118,8 +122,10 @@ class ListsRowBuilder extends StatelessWidget {
                       animationType: animationType,
                       rtlOptions: rtlOptions,
                       customAnimationBuilder: customAnimationBuilder,
-                      child: itemBuilder?.call(context, itemIndex) ??
-                          const SizedBox.shrink(),
+                      child: _buildSizedItem(
+                        context,
+                        itemIndex,
+                      ),
                     ),
                 ],
               ),
@@ -143,7 +149,7 @@ class ListsRowBuilder extends StatelessWidget {
                       child: itemBuilder == null
                           ? const SizedBox.shrink()
                           // this index is item index
-                          : itemBuilder!(context, itemIndex),
+                          : _buildSizedItem(context, itemIndex),
                     ),
             ),
           );
@@ -264,5 +270,23 @@ class ListsRowBuilder extends StatelessWidget {
 
     // Always show separator after actual items
     return separator;
+  }
+
+  Widget _buildSizedItem(BuildContext context, int index) {
+    Widget item = itemBuilder?.call(context, index) ?? const SizedBox.shrink();
+
+    if (mainAxisExtent != null) {
+      item = SizedBox(
+        height: mainAxisExtent,
+        child: item,
+      );
+    } else if (childAspectRatio != null) {
+      item = AspectRatio(
+        aspectRatio: childAspectRatio!,
+        child: item,
+      );
+    }
+
+    return item;
   }
 }

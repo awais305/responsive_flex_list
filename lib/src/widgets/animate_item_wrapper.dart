@@ -6,7 +6,7 @@ import 'package:responsive_flex_list/src/models/rtl_options.dart';
 class AnimateItemWrapper extends StatelessWidget {
   final int index;
   final int maxStaggeredItems;
-  final ResponsiveAnimationType animationType;
+  final AnimationType animationType;
   final CustomAnimationBuilder? customAnimationBuilder;
   final RTLOptions rtlOptions;
   final List<Animation<double>> animations;

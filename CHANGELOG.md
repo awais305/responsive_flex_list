@@ -1,3 +1,9 @@
+## [1.3.0] - 13 Mar 2026
+
+- **Feature**: Added `ResponsiveFlexGridDelegate` support to `ResponsiveFlexList`. This allows centralized configuration of column counts, spacing, and item dimensions.
+- **Deprecation**: Deprecated individual parameters (`childAspectRatio`, `mainAxisExtent`, `crossAxisSpacing`, `mainAxisSpacing`, `minCrossAxisCount`, `maxCrossAxisCount`, `crossAxisCount`) in `ResponsiveFlexList` constructors in favor of `gridDelegate`.
+- **Improvement**: Enhanced `ListsRowBuilder` to intelligently apply `AspectRatio` or `mainAxisExtent` from the delegate.
+
 ## [1.2.0] - 02 Mar 2026
 
 - **Feature**: Added `minCrossAxisCount` and `maxCrossAxisCount` properties to all responsive widgets. This allows defining explicit column boundaries across different screen sizes.

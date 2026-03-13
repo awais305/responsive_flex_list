@@ -43,11 +43,13 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
   final bool useIntrinsicHeight;
   final RTLOptions rtlOptions;
   final double? maxRowHeight;
+  final double? childAspectRatio;
+  final double? mainAxisExtent;
 
   // Animation properties
   final AnimationFlow animationFlow;
   final List<Animation<double>> animations;
-  final ResponsiveAnimationType animationType;
+  final AnimationType animationType;
   final int maxStaggeredItems;
   final CustomAnimationBuilder? customAnimationBuilder;
 
@@ -81,6 +83,8 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
     required this.maxStaggeredItems,
     this.customAnimationBuilder,
     this.mainAxisSeparatorMode,
+    this.childAspectRatio,
+    this.mainAxisExtent,
     @Deprecated('Use itemCount instead') this.items,
   });
 
@@ -173,8 +177,7 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
     required int animationIndex,
     required Widget child,
   }) {
-    if (animationType == ResponsiveAnimationType.none &&
-        customAnimationBuilder == null) {
+    if (animationType == AnimationType.none && customAnimationBuilder == null) {
       return child;
     }
 
@@ -263,6 +266,8 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
       animationType: animationType,
       customAnimationBuilder: customAnimationBuilder,
       maxRowHeight: maxRowHeight,
+      childAspectRatio: childAspectRatio,
+      mainAxisExtent: mainAxisExtent,
     );
   }
 

@@ -68,7 +68,7 @@ enum MainAxisSeparatorMode {
 ///
 /// Each animation type provides a different visual effect when items
 /// appear or change position in the responsive list.
-enum ResponsiveAnimationType {
+enum AnimationType {
   /// No animation - items appear instantly.
   ///
   /// Use this for performance-critical scenarios or when animations

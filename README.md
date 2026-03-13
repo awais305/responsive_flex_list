@@ -24,7 +24,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  responsive_flex_list: ^1.2.0
+  responsive_flex_list: ^1.3.0
 ```
 
 Then run:
@@ -94,7 +94,7 @@ ResponsiveFlexList.builder(
       price: product.price,
     );
   },
-  animationType: ResponsiveAnimationType.slideUp,
+  animationType: AnimationType.slideUp,
 )
 ```
 
@@ -173,7 +173,7 @@ Choose from 8 pre-built animations:
 ```dart
 ResponsiveFlexList(
   children: items,
-  animationType: ResponsiveAnimationType.bounce,
+  animationType: AnimationType.bounce,
   // Options:
   // • none          - No animation (default)
   // • fade          - Gentle fade in
@@ -302,7 +302,7 @@ ResponsiveFlexList.withSeparators(
 | `crossAxisCount`         | Force a specific number of columns             | `1` = list, `3` = 3-col grid                 |
 | `minCrossAxisCount`      | Minimum number of columns to display           | `2`                                          |
 | `maxCrossAxisCount`      | Maximum number of columns to display           | `5`                                          |
-| `animationType`          | Animation style for item transitions           | `ResponsiveAnimationType.bounce`             |
+| `animationType`          | Animation style for item transitions           | `AnimationType.bounce`                       |
 | `animationFlow`          | Controls animation sequence                    | `AnimationFlow.byRow`                        |
 | `breakpoints`            | Custom breakpoint values                       | `Breakpoints(tablet: 800)`                   |
 | `crossAxisSeparator`     | Widget between columns                         | `VerticalDivider(width: 1)`                  |

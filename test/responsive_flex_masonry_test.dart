@@ -68,7 +68,7 @@ void main() {
           itemCount: items.length,
           itemBuilder: (context, index) => Text('Item ${items[index]}'),
           animationDuration: const Duration(milliseconds: 300),
-          animationType: ResponsiveAnimationType.none,
+          animationType: AnimationType.none,
         ),
         throwsAssertionError,
       );
@@ -82,7 +82,7 @@ void main() {
             itemCount: items.length,
             itemBuilder: (context, index) => Text('Item ${items[index]}'),
             animationDuration: const Duration(milliseconds: 300),
-            animationType: ResponsiveAnimationType.fade,
+            animationType: AnimationType.fade,
           ),
         ),
       );
@@ -302,7 +302,7 @@ void main() {
             mainAxisSpacing: 20,
             crossAxisSpacing: 15,
             animationDuration: const Duration(milliseconds: 500),
-            animationType: ResponsiveAnimationType.slide,
+            animationType: AnimationType.slide,
             staggerDelay: const Duration(milliseconds: 50),
           ),
         ),

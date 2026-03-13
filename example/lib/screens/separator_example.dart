@@ -129,7 +129,7 @@ class _SeparatorExampleState extends State<SeparatorExample> {
                 : ResponsiveFlexList.withSeparators(
                     roundRobinLayout: roundRobinLayout,
                     padding: EdgeInsets.symmetric(horizontal: 10),
-                    animationType: ResponsiveAnimationType.bounce,
+                    animationType: AnimationType.bounce,
                     animationDuration: Duration(seconds: 1),
                     animationFlow: AnimationFlow.byRow,
                     useIntrinsicHeight: true,
@@ -139,6 +139,7 @@ class _SeparatorExampleState extends State<SeparatorExample> {
                     crossAxisSeparator: (columnIndex, totalColumns) =>
                         VerticalDivider(thickness: 2, width: 2),
                     itemCount: posts.length,
+
                     itemBuilder: (context, index) {
                       final item = posts[index];
 

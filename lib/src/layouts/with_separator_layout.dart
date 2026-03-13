@@ -40,6 +40,8 @@ class WithSeparatorLayout extends BaseResponsiveLayout {
     required super.maxStaggeredItems,
     super.customAnimationBuilder,
     super.maxRowHeight,
+    super.childAspectRatio,
+    super.mainAxisExtent,
     super.items,
   });
 

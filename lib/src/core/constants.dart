@@ -15,8 +15,7 @@ const int kDefaultMaxStaggeredItems = 20;
 const Curve kDefaultAnimationCurve = Curves.easeInOut;
 
 /// Default animation type
-const ResponsiveAnimationType kDefaultResponsiveAnimationType =
-    ResponsiveAnimationType.none;
+const AnimationType kDefaultAnimationType = AnimationType.none;
 
 /// Default animation mode
 const AnimationFlow kDefaultAnimationFlow = AnimationFlow.simultaneous;

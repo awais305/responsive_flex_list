@@ -27,6 +27,8 @@ class BuilderLayout extends BaseResponsiveLayout {
     required super.animationType,
     required super.maxStaggeredItems,
     super.customAnimationBuilder,
+    super.childAspectRatio,
+    super.mainAxisExtent,
     super.items,
   }) : super(mainAxisSpacing: mainAxisSpacing);
 

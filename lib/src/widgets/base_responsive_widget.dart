@@ -27,7 +27,7 @@ class BaseResponsiveWidget extends StatefulWidget {
     this.breakpoints,
     this.animationDuration,
     this.animationCurve,
-    this.animationType = kDefaultResponsiveAnimationType,
+    this.animationType = kDefaultAnimationType,
     this.animationFlow = kDefaultAnimationFlow,
     this.staggerDelay = kDefaultStaggerDelay,
     this.maxStaggeredItems,
@@ -42,6 +42,9 @@ class BaseResponsiveWidget extends StatefulWidget {
     this.cacheChildren = true,
     this.minCrossAxisCount,
     this.maxCrossAxisCount,
+    this.gridDelegate,
+    this.childAspectRatio,
+    this.mainAxisExtent,
     @Deprecated(
         'Use itemCount instead. If provided, itemCount will be items.length.')
     this.items,
@@ -65,6 +68,15 @@ class BaseResponsiveWidget extends StatefulWidget {
   ///
   /// -> At most 4 columns even on ultra-wide screens
   final int? maxCrossAxisCount;
+
+  /// A delegate that controls the layout of children within the list/grid.
+  final ResponsiveFlexGridDelegate? gridDelegate;
+
+  /// The ratio of the cross-axis to the main-axis extent of each child.
+  final double? childAspectRatio;
+
+  /// The extent of each child in the main axis.
+  final double? mainAxisExtent;
 
   /// List of pre-built child widgets for the children constructor.
   final List<Widget> children;
@@ -129,7 +141,7 @@ class BaseResponsiveWidget extends StatefulWidget {
   final Curve? animationCurve;
 
   /// Type of animation effect (fade, scale, slide, etc.).
-  final ResponsiveAnimationType animationType;
+  final AnimationType animationType;
 
   /// Delay between consecutive item animations in staggered mode.
   final Duration staggerDelay;
@@ -196,7 +208,7 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
   late int crossAxisCount;
 
   /// Tracks current animation type to detect changes and trigger re-animation.
-  ResponsiveAnimationType? _currentAnimationType;
+  AnimationType? _currentAnimationType;
 
   /// Flag indicating whether animations should play on this build.
   bool shouldAnimate = true;
@@ -292,9 +304,7 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
       maxStaggeredItems: maxStaggeredItems,
       customAnimationBuilder: widget.customAnimationBuilder,
       shouldAnimate: shouldAnimate,
-      crossAxisSpacing: widget.crossAxisSpacing,
       crossAxisSeparator: widget.crossAxisSeparator,
-      mainAxisSpacing: widget.mainAxisSpacing,
       mainAxisSeparator: widget.mainAxisSeparator,
       mainAxisSeparatorMode: widget.mainAxisSeparatorMode,
       isRTL: isRTL,
@@ -305,9 +315,29 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
       maxRowHeight: widget.maxRowHeight,
       onLoadingProgress: widget.onLoadingProgress,
       cacheChildren: widget.cacheChildren,
+      childAspectRatio: _getChildAspectRatio(),
+      mainAxisExtent: _getMainAxisExtent(),
+      mainAxisSpacing: _getMainAxisSpacing(),
+      crossAxisSpacing: _getCrossAxisSpacing(),
       items: widget.items,
       children: widget.children,
     );
+  }
+
+  double? _getChildAspectRatio() {
+    return widget.gridDelegate?.childAspectRatio ?? widget.childAspectRatio;
+  }
+
+  double? _getMainAxisExtent() {
+    return widget.gridDelegate?.mainAxisExtent ?? widget.mainAxisExtent;
+  }
+
+  double? _getMainAxisSpacing() {
+    return widget.gridDelegate?.mainAxisSpacing ?? widget.mainAxisSpacing;
+  }
+
+  double? _getCrossAxisSpacing() {
+    return widget.gridDelegate?.crossAxisSpacing ?? widget.crossAxisSpacing;
   }
 
   /// Returns scroll physics with RTL adjustments. Defaults to BouncingScrollPhysics for RTL.
@@ -329,8 +359,10 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
 
   /// Calculates column count based on screen width and breakpoints.
   int _getcrossAxisCount(BoxConstraints constraints) {
-    if (widget.crossAxisCount != null) {
-      return widget.crossAxisCount!.clamp(1, double.infinity).toInt();
+    final effectiveCrossAxisCount =
+        widget.gridDelegate?.crossAxisCount ?? widget.crossAxisCount;
+    if (effectiveCrossAxisCount != null) {
+      return effectiveCrossAxisCount.clamp(1, double.infinity).toInt();
     }
 
     final screenWidth = constraints.maxWidth;
@@ -356,11 +388,16 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
     }
 
     // Apply min/max boundaries
-    if (widget.minCrossAxisCount != null) {
-      count = count.clamp(widget.minCrossAxisCount!, double.infinity).toInt();
+    final effectiveMinCrossAxisCount =
+        widget.gridDelegate?.minCrossAxisCount ?? widget.minCrossAxisCount;
+    final effectiveMaxCrossAxisCount =
+        widget.gridDelegate?.maxCrossAxisCount ?? widget.maxCrossAxisCount;
+
+    if (effectiveMinCrossAxisCount != null) {
+      count = count.clamp(effectiveMinCrossAxisCount, double.infinity).toInt();
     }
-    if (widget.maxCrossAxisCount != null) {
-      count = count.clamp(0, widget.maxCrossAxisCount!).toInt();
+    if (effectiveMaxCrossAxisCount != null) {
+      count = count.clamp(0, effectiveMaxCrossAxisCount).toInt();
     }
 
     return count;

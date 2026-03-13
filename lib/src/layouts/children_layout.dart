@@ -34,6 +34,8 @@ class ChildrenLayout extends BaseResponsiveLayout {
     required super.animations,
     required super.animationType,
     super.customAnimationBuilder,
+    super.childAspectRatio,
+    super.mainAxisExtent,
     required this.children,
     super.items,
   }) : super(

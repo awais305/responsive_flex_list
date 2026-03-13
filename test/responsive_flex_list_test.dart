@@ -179,7 +179,7 @@ void main() {
         expect(
           () => ResponsiveFlexList(
             animationDuration: const Duration(milliseconds: 300),
-            animationType: ResponsiveAnimationType.none,
+            animationType: AnimationType.none,
             children: const [Text('Item')],
           ),
           throwsAssertionError,
@@ -191,7 +191,7 @@ void main() {
           const MaterialApp(
             home: ResponsiveFlexList(
               animationDuration: Duration(milliseconds: 300),
-              animationType: ResponsiveAnimationType.fade,
+              animationType: AnimationType.fade,
               children: [
                 Text('Item 1'),
                 Text('Item 2'),
@@ -209,7 +209,7 @@ void main() {
           const MaterialApp(
             home: ResponsiveFlexList(
               animationDuration: Duration(milliseconds: 300),
-              animationType: ResponsiveAnimationType.slide,
+              animationType: AnimationType.slide,
               children: [
                 Text('Item 1'),
                 Text('Item 2'),
@@ -227,7 +227,7 @@ void main() {
           const MaterialApp(
             home: ResponsiveFlexList(
               animationDuration: Duration(milliseconds: 300),
-              animationType: ResponsiveAnimationType.fade,
+              animationType: AnimationType.fade,
               staggerDelay: Duration(milliseconds: 50),
               children: [
                 Text('Item 1'),
@@ -474,7 +474,7 @@ void main() {
             itemCount: 3,
             itemBuilder: (context, index) => Text('Item $index'),
             animationDuration: const Duration(milliseconds: 300),
-            animationType: ResponsiveAnimationType.none,
+            animationType: AnimationType.none,
           ),
           throwsAssertionError,
         );
@@ -487,7 +487,7 @@ void main() {
               itemCount: const [1, 2, 3].length,
               itemBuilder: (item, index) => Text('Item $item'),
               animationDuration: const Duration(milliseconds: 300),
-              animationType: ResponsiveAnimationType.fade,
+              animationType: AnimationType.fade,
             ),
           ),
         );
@@ -680,7 +680,7 @@ void main() {
               mainAxisSeparator: (index, total) => const Divider(),
               crossAxisSeparator: (index, total) => const VerticalDivider(),
               animationDuration: const Duration(milliseconds: 300),
-              animationType: ResponsiveAnimationType.fade,
+              animationType: AnimationType.fade,
             ),
           ),
         );
@@ -794,7 +794,7 @@ void main() {
             mainAxisSpacing: 20,
             crossAxisSpacing: 15,
             animationDuration: const Duration(milliseconds: 500),
-            animationType: ResponsiveAnimationType.slide,
+            animationType: AnimationType.slide,
             staggerDelay: const Duration(milliseconds: 50),
             rtlOptions: const RTLOptions(
               mirrorAnimations: true,

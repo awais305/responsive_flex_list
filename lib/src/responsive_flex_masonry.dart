@@ -52,7 +52,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.breakpoints,
     super.animationDuration,
     super.animationCurve,
-    super.animationType = kDefaultResponsiveAnimationType,
+    super.animationType = kDefaultAnimationType,
     super.animationFlow,
     super.staggerDelay = kDefaultStaggerDelay,
     super.maxStaggeredItems,
@@ -64,7 +64,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.maxCrossAxisCount,
   })  : assert(
           animationDuration == null ||
-              (animationType != ResponsiveAnimationType.none ||
+              (animationType != AnimationType.none ||
                   customAnimationBuilder != null),
           'animationDuration requires animation to be enabled',
         ),
@@ -101,7 +101,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.breakpoints,
     super.animationDuration,
     super.animationCurve,
-    super.animationType = kDefaultResponsiveAnimationType,
+    super.animationType = kDefaultAnimationType,
     super.animationFlow,
     super.staggerDelay = kDefaultStaggerDelay,
     super.maxStaggeredItems,
@@ -115,7 +115,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.maxCrossAxisCount,
   })  : assert(
           animationDuration == null ||
-              (animationType != ResponsiveAnimationType.none ||
+              (animationType != AnimationType.none ||
                   customAnimationBuilder != null),
           'animationDuration requires animation to be enabled',
         ),

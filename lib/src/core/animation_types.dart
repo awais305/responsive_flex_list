@@ -30,7 +30,7 @@ class AnimationTransitionBuilder {
     required BuildContext context,
     required Widget child,
     required Animation<double> animation,
-    required ResponsiveAnimationType animationType,
+    required AnimationType animationType,
     CustomAnimationBuilder? customBuilder,
     required bool enableRTLMirroring,
   }) {
@@ -57,16 +57,15 @@ class AnimationTransitionBuilder {
   }
 
   /// Gets the mirrored animation type for RTL contexts.
-  static ResponsiveAnimationType _getMirroredAnimationType(
-    ResponsiveAnimationType type,
+  static AnimationType _getMirroredAnimationType(
+    AnimationType type,
   ) {
     switch (type) {
-      case ResponsiveAnimationType.slide:
+      case AnimationType.slide:
         // In RTL, slide should come from left instead of right
-        return ResponsiveAnimationType
-            .slide; // We'll handle the direction in the builder
-      case ResponsiveAnimationType.rotation:
-      case ResponsiveAnimationType.flipIn:
+        return AnimationType.slide; // We'll handle the direction in the builder
+      case AnimationType.rotation:
+      case AnimationType.flipIn:
         // These will be handled in their respective builders
         return type;
       default:
@@ -78,35 +77,35 @@ class AnimationTransitionBuilder {
   static Widget _buildTransition(
     Widget child,
     Animation<double> animation,
-    ResponsiveAnimationType type,
+    AnimationType type,
     bool isRTLMirrored,
   ) {
     switch (type) {
-      case ResponsiveAnimationType.none:
+      case AnimationType.none:
         return child;
 
-      case ResponsiveAnimationType.fade:
+      case AnimationType.fade:
         return _buildFadeTransition(child, animation);
 
-      case ResponsiveAnimationType.scale:
+      case AnimationType.scale:
         return _buildScaleTransition(child, animation, isRTLMirrored);
 
-      case ResponsiveAnimationType.slide:
+      case AnimationType.slide:
         return _buildSlideTransition(child, animation, isRTLMirrored);
 
-      case ResponsiveAnimationType.slideUp:
+      case AnimationType.slideUp:
         return _buildSlideUpTransition(child, animation);
 
-      case ResponsiveAnimationType.slideDown:
+      case AnimationType.slideDown:
         return _buildSlideDownTransition(child, animation);
 
-      case ResponsiveAnimationType.rotation:
+      case AnimationType.rotation:
         return _buildRotationTransition(child, animation, isRTLMirrored);
 
-      case ResponsiveAnimationType.bounce:
+      case AnimationType.bounce:
         return _buildBounceTransition(child, animation);
 
-      case ResponsiveAnimationType.flipIn:
+      case AnimationType.flipIn:
         return _buildFlipInTransition(child, animation, isRTLMirrored);
     }
   }
@@ -206,7 +205,7 @@ class AnimationTransitionBuilder {
   ) {
     return ScaleTransition(
       scale: Tween<double>(
-        begin: 0.4,
+        begin: 0,
         end: 1.0,
       ).animate(CurvedAnimation(parent: animation, curve: Curves.bounceOut)),
       child: child,

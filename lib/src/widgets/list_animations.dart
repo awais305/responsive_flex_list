@@ -51,6 +51,8 @@ class ListAnimations extends StatefulWidget {
     this.maxRowHeight,
     this.onLoadingProgress,
     this.cacheChildren = true,
+    this.childAspectRatio,
+    this.mainAxisExtent,
     @Deprecated('Use itemCount instead') this.items,
   });
 
@@ -73,7 +75,7 @@ class ListAnimations extends StatefulWidget {
   final double? cacheExtent;
   final Duration animationDuration;
   final Curve animationCurve;
-  final ResponsiveAnimationType animationType;
+  final AnimationType animationType;
   final Duration staggerDelay;
   final double maxRowHeightMultiplier;
   final int maxStaggeredItems;
@@ -96,6 +98,9 @@ class ListAnimations extends StatefulWidget {
   ///
   /// Defaults to true. This value is ignored for non-pinterest types.
   final bool cacheChildren;
+
+  final double? childAspectRatio;
+  final double? mainAxisExtent;
 
   @override
   State<ListAnimations> createState() => ListAnimationsState();
@@ -160,7 +165,7 @@ class ListAnimationsState extends State<ListAnimations>
   }
 
   void _tryInitializeAndAnimate() {
-    if (widget.animationType == ResponsiveAnimationType.none) return;
+    if (widget.animationType == AnimationType.none) return;
 
     final int currentItemCount = _getCurrentItemCount();
 
@@ -264,6 +269,8 @@ class ListAnimationsState extends State<ListAnimations>
         primary: widget.primary,
         mainAxisSpacing: widget.mainAxisSpacing!,
         crossAxisSpacing: widget.crossAxisSpacing,
+        childAspectRatio: widget.childAspectRatio,
+        mainAxisExtent: widget.mainAxisExtent,
       );
     }
 
@@ -288,6 +295,8 @@ class ListAnimationsState extends State<ListAnimations>
         animationFlow: widget.animationFlow,
         animations: _animations,
         animationType: widget.animationType,
+        childAspectRatio: widget.childAspectRatio,
+        mainAxisExtent: widget.mainAxisExtent,
         children: widget.children,
       );
     }
@@ -320,6 +329,8 @@ class ListAnimationsState extends State<ListAnimations>
         itemBuilder: widget.itemBuilder,
         roundRobinLayout: widget.roundRobinLayout,
         maxRowHeight: widget.maxRowHeight,
+        childAspectRatio: widget.childAspectRatio,
+        mainAxisExtent: widget.mainAxisExtent,
       );
     }
 

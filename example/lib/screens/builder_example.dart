@@ -29,8 +29,8 @@ class BuilderExample extends StatelessWidget {
               child: ResponsiveFlexList.builder(
                 animationFlow: AnimationFlow.byRow,
                 staggerDelay: Duration(milliseconds: 300),
-                minCrossAxisCount: 4,
-                animationType: ResponsiveAnimationType.slideDown,
+                gridDelegate: ResponsiveFlexGridDelegate(minCrossAxisCount: 3),
+                animationType: AnimationType.slideDown,
                 itemCount: fruits.length,
                 itemBuilder: (context, index) {
                   return _buildCard(fruits[index], index);

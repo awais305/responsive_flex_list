@@ -87,7 +87,7 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
   const ResponsiveFlexList({
     super.key,
     required super.children,
-    super.crossAxisCount,
+    @Deprecated('Use gridDelegate.crossAxisCount instead') super.crossAxisCount,
     super.padding,
     super.physics,
     super.controller,
@@ -100,17 +100,25 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.animationCurve,
     super.animationDuration,
     super.staggerDelay = kDefaultStaggerDelay,
-    super.animationType = kDefaultResponsiveAnimationType,
+    super.animationType = kDefaultAnimationType,
     super.maxStaggeredItems,
+    @Deprecated('Use gridDelegate.crossAxisSpacing instead')
     super.crossAxisSpacing,
+    @Deprecated('Use gridDelegate.mainAxisSpacing instead')
     super.mainAxisSpacing,
     super.customAnimationBuilder,
     super.rtlOptions = RTLOptions.defaults,
+    @Deprecated('Use gridDelegate.minCrossAxisCount instead')
     super.minCrossAxisCount,
+    @Deprecated('Use gridDelegate.maxCrossAxisCount instead')
     super.maxCrossAxisCount,
+    super.gridDelegate,
+    @Deprecated('Use gridDelegate.childAspectRatio instead')
+    super.childAspectRatio,
+    @Deprecated('Use gridDelegate.mainAxisExtent instead') super.mainAxisExtent,
   })  : assert(
           animationDuration == null ||
-              (animationType != ResponsiveAnimationType.none ||
+              (animationType != AnimationType.none ||
                   customAnimationBuilder != null),
           'animationDuration cannot be used with $animationType',
         ),
@@ -152,7 +160,7 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.itemCount,
     super.itemBuilder,
     @Deprecated('Use itemCount instead') super.items,
-    super.crossAxisCount,
+    @Deprecated('Use gridDelegate.crossAxisCount instead') super.crossAxisCount,
     super.padding,
     super.physics,
     super.controller,
@@ -164,18 +172,23 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.animationDuration,
     super.animationCurve,
     super.animationFlow,
-    super.animationType = kDefaultResponsiveAnimationType,
+    super.animationType = kDefaultAnimationType,
     super.staggerDelay = kDefaultStaggerDelay,
     super.maxStaggeredItems,
     super.customAnimationBuilder,
     super.rtlOptions = RTLOptions.defaults,
+    @Deprecated('Use gridDelegate.mainAxisSpacing instead')
     super.mainAxisSpacing = kDefaultMainAxisSpacing,
+    @Deprecated('Use gridDelegate.crossAxisSpacing instead')
     super.crossAxisSpacing = kDefaultCrossAxisSpacing,
+    @Deprecated('Use gridDelegate.minCrossAxisCount instead')
     super.minCrossAxisCount,
+    @Deprecated('Use gridDelegate.maxCrossAxisCount instead')
     super.maxCrossAxisCount,
+    super.gridDelegate,
   })  : assert(
           animationDuration == null ||
-              (animationType != ResponsiveAnimationType.none ||
+              (animationType != AnimationType.none ||
                   customAnimationBuilder != null),
           'animationDuration cannot be used with $animationType',
         ),
@@ -208,14 +221,14 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
   ///   crossAxisSeparator: (index, count) => VerticalDivider(thickness: 1),
   /// )
   /// ```
-  const ResponsiveFlexList.withSeparators({
+  ResponsiveFlexList.withSeparators({
     super.key,
     super.itemCount,
     super.itemBuilder,
     @Deprecated('Use itemCount instead') super.items,
     required super.mainAxisSeparator,
     required super.crossAxisSeparator,
-    super.crossAxisCount,
+    @Deprecated('Use gridDelegate.crossAxisCount instead') super.crossAxisCount,
     super.padding,
     super.physics,
     super.controller,
@@ -227,7 +240,7 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.breakpoints,
     super.animationDuration,
     super.animationCurve,
-    super.animationType = kDefaultResponsiveAnimationType,
+    super.animationType = kDefaultAnimationType,
     super.animationFlow,
     super.staggerDelay = kDefaultStaggerDelay,
     super.maxStaggeredItems,
@@ -236,9 +249,14 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.useIntrinsicHeight = false,
     super.maxRowHeight,
     super.roundRobinLayout = false,
+    @Deprecated('Use gridDelegate.minCrossAxisCount instead')
     super.minCrossAxisCount,
+    @Deprecated('Use gridDelegate.maxCrossAxisCount instead')
     super.maxCrossAxisCount,
-  }) : super(
+    super.gridDelegate,
+  })  : assert(!roundRobinLayout || gridDelegate?.childAspectRatio == null,
+            'You can only pass one of `roundRobinLayout` or `gridDelegate.childAspectRatio`'),
+        super(
           children: const [],
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
