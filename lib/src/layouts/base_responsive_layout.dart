@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 
 import 'package:responsive_flex_list/src/core/core.dart';
 import 'package:responsive_flex_list/src/models/models.dart';
@@ -30,7 +31,7 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
   final bool shrinkWrap;
   final bool reverse;
   final bool? primary;
-  final double? cacheExtent;
+  final double? scrollCacheExtent;
 
   // Spacing and layout properties
   final double? mainAxisSpacing;
@@ -68,7 +69,7 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
     required this.shrinkWrap,
     required this.reverse,
     this.primary,
-    this.cacheExtent,
+    this.scrollCacheExtent,
     this.mainAxisSpacing,
     this.crossAxisSpacing,
     this.mainAxisSeparator,
@@ -87,6 +88,10 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
     this.mainAxisExtent,
     @Deprecated('Use itemCount instead') this.items,
   });
+
+  ScrollCacheExtent? get effectiveScrollCacheExtent => scrollCacheExtent == null
+      ? null
+      : ScrollCacheExtent.pixels(scrollCacheExtent!);
 
   /// Abstract method that must be implemented by concrete layout classes
   /// This is where each layout defines its specific building logic

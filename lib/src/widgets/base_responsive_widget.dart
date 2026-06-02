@@ -23,7 +23,7 @@ class BaseResponsiveWidget extends StatefulWidget {
     this.shrinkWrap = false,
     this.reverse = false,
     this.primary,
-    this.cacheExtent,
+    this.scrollCacheExtent,
     this.breakpoints,
     this.animationDuration,
     this.animationCurve,
@@ -126,7 +126,7 @@ class BaseResponsiveWidget extends StatefulWidget {
   final bool? primary;
 
   /// Viewport cache extent for performance optimization.
-  final double? cacheExtent;
+  final double? scrollCacheExtent;
 
   /// Responsive breakpoints configuration for different screen sizes.
   final Breakpoints? breakpoints;
@@ -295,7 +295,7 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
       shrinkWrap: widget.shrinkWrap,
       reverse: _getEffectiveReverse(),
       primary: widget.primary,
-      cacheExtent: widget.cacheExtent,
+      scrollCacheExtent: widget.scrollCacheExtent,
       animationDuration: widget.animationDuration ?? kDefaultAnimationDuration,
       animationCurve: widget.animationCurve ?? kDefaultAnimationCurve,
       animationType: widget.animationType,
@@ -366,11 +366,14 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
     }
 
     final screenWidth = constraints.maxWidth;
-    final points = widget.breakpoints ??
-        ResponsiveConfig.breakpoints.mergeWith(widget.breakpoints);
+    final points = ResponsiveConfig.breakpoints.mergeWith(widget.breakpoints);
 
     int count;
-    if (points.largeDesktop != null && screenWidth >= points.largeDesktop!) {
+    if (points.extraLargeDesktop != null &&
+        screenWidth >= points.extraLargeDesktop!) {
+      count = points.extraLargeDesktopColumns;
+    } else if (points.largeDesktop != null &&
+        screenWidth >= points.largeDesktop!) {
       count = points.largeDesktopColumns;
     } else if (points.desktop != null && screenWidth >= points.desktop!) {
       count = points.desktopColumns;

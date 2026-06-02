@@ -24,7 +24,7 @@ class WithSeparatorLayout extends BaseResponsiveLayout {
     required super.shrinkWrap,
     required super.reverse,
     super.primary,
-    super.cacheExtent,
+    super.scrollCacheExtent,
     required super.mainAxisSeparator,
     required super.crossAxisSeparator,
     super.mainAxisSpacing,
@@ -58,7 +58,7 @@ class WithSeparatorLayout extends BaseResponsiveLayout {
         physics: physics,
         controller: controller,
         primary: primary,
-        cacheExtent: cacheExtent,
+        scrollCacheExtent: scrollCacheExtent,
         reverse: reverse,
         shrinkWrap: shrinkWrap,
         crossAxisSeparator: crossAxisSeparator,
@@ -88,7 +88,7 @@ class WithSeparatorLayout extends BaseResponsiveLayout {
       physics: physics,
       reverse: reverse,
       primary: primary,
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: effectiveScrollCacheExtent,
       slivers: [
         SliverPadding(
           padding: padding ?? EdgeInsets.zero,

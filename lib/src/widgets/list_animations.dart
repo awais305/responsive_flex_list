@@ -29,7 +29,7 @@ class ListAnimations extends StatefulWidget {
     this.shrinkWrap = false,
     this.reverse = false,
     this.primary,
-    this.cacheExtent,
+    this.scrollCacheExtent,
     required this.animationDuration,
     required this.animationCurve,
     required this.animationType,
@@ -72,7 +72,7 @@ class ListAnimations extends StatefulWidget {
   final bool shrinkWrap;
   final bool reverse;
   final bool? primary;
-  final double? cacheExtent;
+  final double? scrollCacheExtent;
   final Duration animationDuration;
   final Curve animationCurve;
   final AnimationType animationType;
@@ -260,7 +260,7 @@ class ListAnimationsState extends State<ListAnimations>
         animations: _animations,
         animationType: widget.animationType,
         maxStaggeredItems: widget.maxStaggeredItems,
-        cacheExtent: widget.cacheExtent,
+        scrollCacheExtent: widget.scrollCacheExtent,
         controller: widget.controller,
         customAnimationBuilder: widget.customAnimationBuilder,
         itemBuilder: widget.itemBuilder,
@@ -281,7 +281,7 @@ class ListAnimationsState extends State<ListAnimations>
         controller: widget.controller,
         physics: widget.physics,
         padding: widget.padding,
-        cacheExtent: widget.cacheExtent,
+        scrollCacheExtent: widget.scrollCacheExtent,
         customAnimationBuilder: widget.customAnimationBuilder,
         primary: widget.primary,
         reverse: widget.reverse,
@@ -320,7 +320,7 @@ class ListAnimationsState extends State<ListAnimations>
         controller: widget.controller,
         physics: widget.physics,
         primary: widget.primary,
-        cacheExtent: widget.cacheExtent,
+        scrollCacheExtent: widget.scrollCacheExtent,
         crossAxisSeparator: widget.crossAxisSeparator,
         mainAxisSeparator: widget.mainAxisSeparator,
         crossAxisSpacing: widget.crossAxisSpacing,
@@ -376,7 +376,7 @@ class ListAnimationsState extends State<ListAnimations>
         physics: widget.physics,
         controller: widget.controller,
         primary: widget.primary,
-        cacheExtent: widget.cacheExtent,
+        scrollCacheExtent: widget.scrollCacheExtent,
       );
     }
 

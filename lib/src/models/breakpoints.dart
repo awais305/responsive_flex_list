@@ -1,15 +1,15 @@
 /// Defines responsive breakpoints and their corresponding column counts.
 ///
-/// You can customize this globally with [ResponsiveFlexConfig.init]
+/// You can customize this globally with [ResponsiveConfig.init]
 /// or per-list by passing [breakpoints] directly.
 class Breakpoints {
   static const Breakpoints defaultBreakpoints = Breakpoints(
     smallMobile: 320,
     mobile: 480,
     smallTablet: 640,
-    tablet: 820,
-    laptop: 1024,
-    desktop: 1280,
+    tablet: 768,
+    laptop: 820,
+    desktop: 1024,
     largeDesktop: 1440,
     extraLargeDesktop: 1920,
     smallMobileColumns: 1,
@@ -22,28 +22,28 @@ class Breakpoints {
     extraLargeDesktopColumns: 8,
   );
 
-  /// Small mobile devices (e.g., older iPhones, < 320px).
+  /// Small mobile devices. This is the fallback size below [mobile].
   final double? smallMobile;
 
-  /// Standard mobile devices (e.g., iPhone 12, Pixel, < 480px).
+  /// Standard mobile devices (e.g., iPhone 12, Pixel), starting at this width.
   final double? mobile;
 
-  /// Small tablets (e.g., iPad Mini, < 640px).
+  /// Small tablets (e.g., iPad Mini), starting at this width.
   final double? smallTablet;
 
-  /// Full tablets (e.g., iPad, < 820px).
+  /// Full tablets (e.g., iPad), starting at this width.
   final double? tablet;
 
-  /// Small laptops (e.g., MacBook Air 11", < 1024px).
+  /// Small laptops (e.g., MacBook Air 11"), starting at this width.
   final double? laptop;
 
-  /// Desktops (e.g., 13"–15" screens, < 1280px).
+  /// Desktops (e.g., 13"-15" screens), starting at this width.
   final double? desktop;
 
-  /// Large desktops (e.g., ultrawide monitors, < 1440px).
+  /// Large desktops (e.g., ultrawide monitors), starting at this width.
   final double? largeDesktop;
 
-  /// Extra large desktops (e.g., 4K setups, < 1920px).
+  /// Extra large desktops (e.g., 4K setups), starting at this width.
   final double? extraLargeDesktop;
 
   /// Number of columns for each breakpoint.
@@ -110,6 +110,7 @@ class Breakpoints {
     double? laptop,
     double? desktop,
     double? largeDesktop,
+    double? extraLargeDesktop,
     int? smallMobileColumns,
     int? mobileColumns,
     int? smallTabletColumns,
@@ -117,6 +118,7 @@ class Breakpoints {
     int? laptopColumns,
     int? desktopColumns,
     int? largeDesktopColumns,
+    int? extraLargeDesktopColumns,
   }) =>
       Breakpoints(
         smallMobile: smallMobile ?? this.smallMobile,
@@ -126,6 +128,7 @@ class Breakpoints {
         laptop: laptop ?? this.laptop,
         desktop: desktop ?? this.desktop,
         largeDesktop: largeDesktop ?? this.largeDesktop,
+        extraLargeDesktop: extraLargeDesktop ?? this.extraLargeDesktop,
         smallMobileColumns: smallMobileColumns ?? this.smallMobileColumns,
         mobileColumns: mobileColumns ?? this.mobileColumns,
         smallTabletColumns: smallTabletColumns ?? this.smallTabletColumns,
@@ -133,6 +136,8 @@ class Breakpoints {
         laptopColumns: laptopColumns ?? this.laptopColumns,
         desktopColumns: desktopColumns ?? this.desktopColumns,
         largeDesktopColumns: largeDesktopColumns ?? this.largeDesktopColumns,
+        extraLargeDesktopColumns:
+            extraLargeDesktopColumns ?? this.extraLargeDesktopColumns,
       );
 
   /// Merges this breakpoints configuration with another, using the other's
@@ -150,6 +155,7 @@ class Breakpoints {
       laptop: other.laptop ?? laptop,
       desktop: other.desktop ?? desktop,
       largeDesktop: other.largeDesktop ?? largeDesktop,
+      extraLargeDesktop: other.extraLargeDesktop ?? extraLargeDesktop,
       smallMobileColumns: other.smallMobileColumns,
       mobileColumns: other.mobileColumns,
       smallTabletColumns: other.smallTabletColumns,
@@ -157,6 +163,7 @@ class Breakpoints {
       laptopColumns: other.laptopColumns,
       desktopColumns: other.desktopColumns,
       largeDesktopColumns: other.largeDesktopColumns,
+      extraLargeDesktopColumns: other.extraLargeDesktopColumns,
     );
   }
 
@@ -209,13 +216,15 @@ class Breakpoints {
         'laptop: $laptop, '
         'desktop: $desktop, '
         'largeDesktop: $largeDesktop, '
+        'extraLargeDesktop: $extraLargeDesktop, '
         'smallMobileColumns: $smallMobileColumns, '
         'mobileColumns: $mobileColumns, '
         'smallTabletColumns: $smallTabletColumns, '
         'tabletColumns: $tabletColumns, '
         'laptopColumns: $laptopColumns, '
         'desktopColumns: $desktopColumns, '
-        'largeDesktopColumns: $largeDesktopColumns'
+        'largeDesktopColumns: $largeDesktopColumns, '
+        'extraLargeDesktopColumns: $extraLargeDesktopColumns'
         ')';
   }
 
@@ -231,13 +240,15 @@ class Breakpoints {
         laptop == other.laptop &&
         desktop == other.desktop &&
         largeDesktop == other.largeDesktop &&
+        extraLargeDesktop == other.extraLargeDesktop &&
         smallMobileColumns == other.smallMobileColumns &&
         mobileColumns == other.mobileColumns &&
         smallTabletColumns == other.smallTabletColumns &&
         tabletColumns == other.tabletColumns &&
         laptopColumns == other.laptopColumns &&
         desktopColumns == other.desktopColumns &&
-        largeDesktopColumns == other.largeDesktopColumns;
+        largeDesktopColumns == other.largeDesktopColumns &&
+        extraLargeDesktopColumns == other.extraLargeDesktopColumns;
   }
 
   @override
@@ -250,6 +261,7 @@ class Breakpoints {
       laptop,
       desktop,
       largeDesktop,
+      extraLargeDesktop,
       smallMobileColumns,
       mobileColumns,
       smallTabletColumns,
@@ -257,6 +269,7 @@ class Breakpoints {
       laptopColumns,
       desktopColumns,
       largeDesktopColumns,
+      extraLargeDesktopColumns,
     );
   }
 }

@@ -1,360 +1,283 @@
 # ResponsiveFlexList
 
+Responsive Flutter list, grid, and masonry layouts with animations, separators, breakpoints, and RTL-aware behavior.
+
 <p align="center">
   <a href="https://pub.dev/packages/responsive_flex_list"><img src="https://img.shields.io/pub/v/responsive_flex_list.svg" alt="pub package"></a>
   <a href="https://pub.dev/packages/responsive_flex_list/score"><img src="https://img.shields.io/pub/likes/responsive_flex_list" alt="likes"></a>
   <a href="https://pub.dev/packages/responsive_flex_list/score"><img src="https://img.shields.io/pub/points/responsive_flex_list" alt="pub points"></a>
 </p>
 
-A responsive and animated Flutter list/grid package with smooth transitions, optional dividers, and full RTL support that adapts effortlessly from single-column lists to multi-column layouts.
+`responsive_flex_list` helps you build adaptive Flutter layouts that change from a single-column list to a multi-column grid or masonry layout based on available width. It is useful for mobile, tablet, desktop, and Flutter web screens where you do not want to repeat `ListView`, `GridView`, `LayoutBuilder`, and breakpoint logic in every view.
 
-![Demo](assets/demo.gif)
+Use it for Flutter responsive lists, Flutter responsive grids, list-to-grid layouts, responsive dashboard cards, Pinterest-style masonry, Instagram-style masonry, and other adaptive Flutter layouts.
 
-## Why ResponsiveFlexList?
+![Responsive Flutter list to grid demo](assets/demo.gif)
 
-- 📱 **Auto-responsive** - ListView on mobile → GridView on desktop
-- ✨ **8 built-in animations** - No AnimationController needed
-- 🧱 **Masonry layouts** - Instagram/Pinterest style grids
-- 🌍 **RTL ready** - Perfect for global apps
-- ⚡ **Performant** - Built on Slivers, handles large lists smoothly
+## Features
 
-## Installation
+- Responsive list-to-grid layout: single-column on small screens, multi-column on larger screens.
+- Standard list/grid modes are sliver-based for efficient scrolling.
+- Builder and children APIs for static or dynamic data.
+- Built-in item animations and animation sequencing.
+- Smart separators for list and grid modes.
+- Custom breakpoints and column limits.
+- RTL-aware layout and animation options.
+- Instagram-style and Pinterest-style masonry layouts.
 
-Add to your `pubspec.yaml`:
+## Install
 
 ```yaml
 dependencies:
   responsive_flex_list: ^1.3.0
 ```
 
-Then run:
-
 ```bash
 flutter pub get
 ```
 
-## Getting Started
+```dart
+import 'package:responsive_flex_list/responsive_flex_list.dart';
+```
 
-Initialize the package with your custom breakpoints before use (optional):
+Optional global breakpoints:
 
 ```dart
-import 'package:flutter/material.dart';
-import 'package:responsive_flex_list/responsive_flex_list.dart';
-
 void main() {
-// Optional: Initialize custom breakpoints
-  // ResponsiveConfig.init(
-  //   breakpoints: Breakpoints.defaultBreakpoints or Breakpoints.onlyWith(...) or Breakpoints(...)
-  // );
+  ResponsiveConfig.init(
+    breakpoints: Breakpoints.defaultBreakpoints,
+  );
 
   runApp(const MyApp());
 }
 ```
 
-## Responsive Behavior
+## When To Use It
 
-Automatically adapts column count based on screen width:
+Use `responsive_flex_list` when you need:
 
-| Screen Size         | Max Width | Default Columns      |
-| ------------------- | --------- | -------------------- |
-| Small Mobile        | < 320px   | **List** (1 column)  |
-| Mobile              | < 480px   | **Grid** (2 columns) |
-| Small Tablet        | < 640px   | **Grid** (3 columns) |
-| Tablet              | < 820px   | **Grid** (4 columns) |
-| Laptop              | < 1024px  | **Grid** (5 columns) |
-| Desktop             | < 1280px  | **Grid** (6 columns) |
-| Large Desktop       | < 1440px  | **Grid** (7 columns) |
-| Extra Large Desktop | ≥ 1920px  | **Grid** (8 columns) |
+- A list on small screens and a grid on larger screens.
+- A responsive Flutter grid for mobile, tablet, desktop, or web.
+- Cleaner responsive UI code without repeating `LayoutBuilder`.
+- Smart separators that work in both list and grid modes.
+- Built-in item animations without managing `AnimationController`.
+- Masonry layouts for galleries, feeds, dashboards, listings, or portfolio grids.
+- RTL-aware behavior for Arabic, Persian, Urduor other right-to-left interfaces.
+
+## When Not To Use It
+
+You may not need this package if you only need a fixed `ListView`, a basic fixed-column `GridView`, or a layout that never changes across screen sizes.
+
+Use caution with very large dynamic-height masonry collections. Pinterest masonry intentionally prebuilds and measures children to keep item positions stable, so it is not a lazy masonry layout.
+
+## Why Not Just Use GridView?
+
+Flutter's `GridView` is great when you already know the exact grid structure. `responsive_flex_list` is useful when one screen needs to adapt across widths with one API.
+
+| Need | Flutter default approach | With ResponsiveFlexList |
+| --- | --- | --- |
+| List on small screens, grid on larger screens | Manual `LayoutBuilder` logic | Built in |
+| Fixed grid | `GridView` | Supported |
+| Masonry / Pinterest-style layout | Custom layout/package | Built in |
+| Animated item appearance | Manual animation setup | Built in |
+| Separators in list and grid | Manual layout handling | Built in |
+| Custom breakpoints | Manual width checks | Built in |
+| RTL-aware animations | Manual direction checks | Built in |
 
 ## Basic Usage
 
-### Simple List to Grid
-
-Single column on phones, multi-column grid on tablets/desktop
-
-```dart
-ResponsiveFlexList(
-  children: [
-    Card(child: ListTile(title: Text('Item 1'))),
-    Card(child: ListTile(title: Text('Item 2'))),
-    Card(child: ListTile(title: Text('Item 3'))),
-  ],
-)
-```
-
-### Dynamic Data with Builder
+### Dynamic List To Grid
 
 ```dart
 ResponsiveFlexList.builder(
   itemCount: products.length,
   itemBuilder: (context, index) {
     final product = products[index];
-    return ProductCard(
-      title: product.name,
-      price: product.price,
-    );
+    return ProductCard(product: product);
   },
-  animationType: AnimationType.slideUp,
 )
 ```
 
-**Note:** The `itemBuilder` now receives `BuildContext context` and `int index`. Access items from your list using the index parameter.
-
-### Force List Mode (1 Column)
+### Static Children
 
 ```dart
 ResponsiveFlexList(
-  crossAxisCount: 1, // Always list view
-  children: items,
+  children: dashboardCards
+      .map((card) => DashboardCard(data: card))
+      .toList(),
 )
 ```
 
-### Force Grid Mode (Fixed Columns)
+### Fixed Columns Or Hard Column Limits
 
 ```dart
-ResponsiveFlexList(
-  crossAxisCount: 3, // Always 3-column grid
-  children: items,
+ResponsiveFlexList.builder(
+  itemCount: items.length,
+  itemBuilder: (context, index) => GalleryImageCard(items[index]),
+  gridDelegate: const ResponsiveFlexGridDelegate(
+    // Column count will never go below 2 or above 4.
+    minCrossAxisCount: 2,
+    maxCrossAxisCount: 4,
+  ),
 )
 ```
 
-### Column Boundaries (Min/Max)
+`minCrossAxisCount` and `maxCrossAxisCount` are hard boundaries. Responsive breakpoints still choose the column count, but the final value is clamped inside this range. Use `crossAxisCount` when you want one fixed column count.
 
-Define boundaries while still allowing responsiveness within that range:
+### Separators
 
 ```dart
-ResponsiveFlexList(
-  minCrossAxisCount: 2, // At least 2 columns even on small phones
-  maxCrossAxisCount: 4, // At most 4 columns even on ultra-wide screens
-  children: items,
+ResponsiveFlexList.withSeparators(
+  itemCount: settings.length,
+  itemBuilder: (context, index) => SettingTile(settings[index]),
+  mainAxisSeparator: (rowIndex, totalRows) => const Divider(),
+  crossAxisSeparator: (columnIndex, totalColumns) => const VerticalDivider(),
+  useIntrinsicHeight: true,
 )
 ```
 
-### Custom Breakpoints
+In list mode, only row separators are shown. In grid mode, row and column separators can both be used.
+
+## Breakpoints
+
+Default breakpoints use lower-bound semantics. For example, `desktop: 1024` applies from `1024px` up to, but not including, the next defined breakpoint.
+
+| Screen Size | Width Range | Default Columns |
+| --- | --- | --- |
+| Small Mobile | < 480px | 1 |
+| Mobile | >= 480px and < 640px | 2 |
+| Small Tablet | >= 640px and < 768px | 3 |
+| Tablet | >= 768px and < 820px | 4 |
+| Laptop | >= 820px and < 1024px | 5 |
+| Desktop | >= 1024px and < 1440px | 6 |
+| Large Desktop | >= 1440px and < 1920px | 7 |
+| Extra Large Desktop | >= 1920px | 8 |
+
+Per-widget override:
 
 ```dart
 ResponsiveFlexList.builder(
   itemCount: items.length,
   itemBuilder: (context, index) => MyCard(items[index]),
   breakpoints: Breakpoints(
-    tablet: 900,        // Custom tablet breakpoint
-    desktopColumns: 6,  // 6 columns on desktop
-    // Other values use defaults
+    desktop: 1100,
+    desktopColumns: 6,
   ),
 )
 ```
 
-## Helper Extensions
-
-Access responsive checks directly from context:
+## Context Extensions
 
 ```dart
-if (context.isTablet) { ... }
-if (context.isMobile) { ... }
+if (context.isDesktop) {
+  // Desktop-specific UI
+}
+
 final width = context.screenWidth;
 ```
 
-Define only the breakpoints you need:
+Context extensions read the latest `ResponsiveConfig.breakpoints`. Breakpoints omitted with `Breakpoints.onlyWith(...)` make the matching helper return `false`.
+
+## Animations
 
 ```dart
-ResponsiveConfig.init(
-  breakpoints: Breakpoints.onlyWith(
-    mobile: 480,
-    desktop: 1024,
-  ),
-);
-// Now context.isTablet, context.isLaptop return false
-```
-
-## Built-in Animations
-
-Choose from 8 pre-built animations:
-
-```dart
-ResponsiveFlexList(
-  children: items,
-  animationType: AnimationType.bounce,
-  // Options:
-  // • none          - No animation (default)
-  // • fade          - Gentle fade in
-  // • scale         - Scale up from small
-  // • slide         - Slide from left/right (RTL aware)
-  // • slideUp       - Slide up from bottom
-  // • slideDown     - Slide down from top
-  // • rotation      - Rotate in (RTL aware)
-  // • bounce        - Bouncy entrance
-  // • flipIn        - Flip from half-rotation
-)
-```
-
-### Animation Sequencing
-
-```dart
-ResponsiveFlexList(
-  children: items,
+ResponsiveFlexList.builder(
+  itemCount: items.length,
+  itemBuilder: (context, index) => MyCard(items[index]),
+  animationType: AnimationType.slideUp,
   animationFlow: AnimationFlow.byRow,
-  // Options:
-  // • individual    - One by one
-  // • byRow         - Row by row
-  // • byColumn      - Column by column
-  // • simultaneous  - All together (default)
-  staggerDelay: Duration(milliseconds: 150),
+  staggerDelay: const Duration(milliseconds: 80),
 )
 ```
+
+Animation types include `none`, `fade`, `scale`, `slide`, `slideUp`, `slideDown`, `rotation`, `bounce`, and `flipIn`.
 
 ## Masonry Layouts
 
-Perfect for photo galleries and content feeds with variable heights.
-
 ### Instagram Style
 
-Perfectly replicates Instagram Explore layout
+Inspired by Instagram Explore-style row patterns. Good for photo galleries and explore-style layouts. This mode enforces a minimum of 3 columns.
 
 ```dart
 ResponsiveFlexMasonry.instagram(
   itemCount: photos.length,
   itemBuilder: (context, index) {
-    final photo = photos[index];
     return Image.network(
-      photo.url,
+      photos[index].url,
       fit: BoxFit.cover,
       width: double.infinity,
     );
   },
-  maxRowHeightMultiplier: 1.0, // Adjust if needed
 )
 ```
 
-<img height="600" alt="instagram" src="assets/instagram.png" />
+<img height=600 alt="Responsive Instagram-style Flutter masonry grid layout" src="assets/instagram.png" />
 
 ### Pinterest Style
 
-Pinterest-style masonry with variable heights
+Pinterest-style masonry supports variable item heights and enforces a minimum of 2 columns.
 
 ```dart
 ResponsiveFlexMasonry.pinterest(
   itemCount: products.length,
-  itemBuilder: (context, index) {
-    final product = products[index];
-    return ProductCard(product)
-  },
+  itemBuilder: (context, index) => ProductCard(products[index]),
 )
 ```
 
-<img height="600" alt="pinterest" src="assets/pinterest.png" />
+<img height=600 alt="Responsive Pinterest-style Flutter masonry layout with dynamic item heights" src="assets/pinterest.png" />
 
-## Smart Separators
+Pinterest masonry is intentionally non-lazy: it prebuilds and measures children so item positions remain stable while scrolling and while dragging the scrollbar thumb. This avoids visible reflow or jumping that can happen in some lazy staggered layouts.
 
-Add separators that work intelligently across list and grid modes:
+Tradeoff: higher initial work and memory use. Recommended for small to medium collections, roughly 100-150 lightweight items depending on item complexity and device performance.
 
-```dart
-ResponsiveFlexList.withSeparators(
-  itemCount: listItems.length,
-  itemBuilder: (context, index) {
-    final item = listItems[index];
-    return ListTile(title: Text(item));
-  },
+`cacheChildren` defaults to `true`, which preserves built item widgets across parent rebuilds. Set it to `false` only when your Pinterest item widgets must rebuild on every parent rebuild.
 
-  // Horizontal dividers between rows
-  mainAxisSeparator: (rowIndex, totalRows) => Divider(color: Colors.grey),
+## API Snapshot
 
-  // Vertical dividers between columns
-  crossAxisSeparator: (columnIndex, totalColumns) => Container(
-    width: 1,
-    color: Colors.grey[300],
-  ),
+| API | Use |
+| --- | --- |
+| `ResponsiveFlexList(...)` | Responsive layout from a list of children |
+| `ResponsiveFlexList.builder(...)` | Responsive layout for dynamic data |
+| `ResponsiveFlexList.withSeparators(...)` | List/grid layout with row and column separators |
+| `ResponsiveFlexMasonry.instagram(...)` | Instagram-style masonry rows |
+| `ResponsiveFlexMasonry.pinterest(...)` | Pinterest-style variable-height masonry |
+| `ResponsiveFlexGridDelegate` | Fixed columns, min/max columns, spacing, item sizing |
+| `Breakpoints` | Width thresholds and column counts |
+| `ResponsiveConfig.init(...)` | Global breakpoint configuration |
 
-  // Control divider width behavior
-  mainAxisSeparatorMode: MainAxisSeparatorMode.fullWidth, // or itemWidth
+Legacy direct layout parameters such as `crossAxisCount`, `minCrossAxisCount`, `maxCrossAxisCount`, `mainAxisSpacing`, and `crossAxisSpacing` are still supported for compatibility, but new code should prefer `gridDelegate`.
 
-  // Required when displaying vertical dividers
-  useIntrinsicHeight: true,
-)
-```
+## FAQ
 
-### Separator Behavior
+### Is ResponsiveFlexList a replacement for GridView?
 
-#### Display Modes
+Not exactly. `GridView` is still good for fixed grids. `responsive_flex_list` is useful when one layout needs to adapt from list to grid or masonry based on screen width.
 
-- **List mode (1 column):** Only `mainAxisSeparator` appears between rows (similar to `ListView.separated`)
-- **Grid mode (2+ columns):** Both `mainAxisSeparator` (horizontal) and `crossAxisSeparator` (vertical) appear between items.
+### Does it work on Flutter web?
 
-#### Separator Width Options
+Yes. It is useful for Flutter web, desktop, tablet, and mobile layouts where column count should adapt to available width.
 
-- **fullWidth:** Separators span the entire container width (similar to `ListView.separated`)
-- **itemWidth:** Separators only appear between individual items.
+### Does it support masonry layouts?
 
-#### Layout Algorithm
+Yes. Use `ResponsiveFlexMasonry.instagram` for Instagram Explore-style row patterns or `ResponsiveFlexMasonry.pinterest` for Pinterest-style layouts with variable item heights.
 
-- **roundRobinLayout:** Distributes items sequentially across columns in rotation (1→2→3→1→2→3...)
+### Is Pinterest masonry lazy?
 
-|                      Item Width Mode                      |              Round Robin Layout               |
-| :-------------------------------------------------------: | :-------------------------------------------: |
-| ![Item width separators](assets/item_width_separator.png) | ![Round robin layout](assets/round_robin.png) |
-|              _Separators only between items_              |        _Similar to Newspaper' columns_        |
+No. Pinterest masonry intentionally prebuilds and measures children to keep item positions stable during scrolling. This improves visual stability but makes it better suited for small to medium collections.
 
-## API Reference
+### Can I force or limit column count?
 
-### Core Properties
+Yes. Use `ResponsiveFlexGridDelegate(crossAxisCount: ...)`, `minCrossAxisCount`, or `maxCrossAxisCount`.
 
-| Property                 | Description                                    | Example                                      |
-| ------------------------ | ---------------------------------------------- | -------------------------------------------- |
-| `crossAxisCount`         | Force a specific number of columns             | `1` = list, `3` = 3-col grid                 |
-| `minCrossAxisCount`      | Minimum number of columns to display           | `2`                                          |
-| `maxCrossAxisCount`      | Maximum number of columns to display           | `5`                                          |
-| `animationType`          | Animation style for item transitions           | `AnimationType.bounce`                       |
-| `animationFlow`          | Controls animation sequence                    | `AnimationFlow.byRow`                        |
-| `breakpoints`            | Custom breakpoint values                       | `Breakpoints(tablet: 800)`                   |
-| `crossAxisSeparator`     | Widget between columns                         | `VerticalDivider(width: 1)`                  |
-| `crossAxisSpacing`       | Horizontal spacing between columns             | `8.0`                                        |
-| `mainAxisSeparator`      | Widget between rows                            | `Divider(thickness: 1)`                      |
-| `mainAxisSeparatorMode`  | How horizontal separators display              | `MainAxisSeparatorMode.itemWidth`            |
-| `roundRobinLayout`       | Distributes items sequentially across columns  | `true`                                       |
-| `mainAxisSpacing`        | Vertical spacing between rows                  | `8.0`                                        |
-| `useIntrinsicHeight`     | Match row heights to tallest item in row       | `true`                                       |
-| `maxRowHeight`           | Maximum row height constraint (pixels)         | `200.0`                                      |
-| `maxRowHeightMultiplier` | Height multiplier for Instagram-style layouts  | `1.5`                                        |
-| `onLoadingProgress`      | Callback for Pinterest layout loading progress | `(loaded, total) => print('$loaded/$total')` |
-| `staggerDelay`           | Delay between animated items                   | `Duration(milliseconds: 150)`                |
-| `maxStaggeredItems`      | Limit animated items for performance           | `50`                                         |
+### Does it support RTL layouts?
 
-### Context Extensions
-
-| Property              | Description                                  | Range                     |
-| --------------------- | -------------------------------------------- | ------------------------- |
-| `screenWidth`         | Current screen width                         | `375.0`, `1920.0`         |
-| `screenHeight`        | Current screen height                        | `812.0`, `1080.0`         |
-| `isSmallMobile`       | Extra small phones                           | < 320px                   |
-| `isMobile`            | Standard phones                              | 320px - 480px             |
-| `isSmallTablet`       | Large phones / small tablets                 | 480px - 640px             |
-| `isTablet`            | Tablets                                      | 640px - 820px             |
-| `isLaptop`            | Small laptops                                | 820px - 1024px            |
-| `isDesktop`           | Desktop screens                              | 1024px - 1280px           |
-| `isLargeDesktop`      | Large desktop screens                        | 1280px - 1440px           |
-| `isExtraLargeDesktop` | Extra large desktop screens                  | ≥ 1440px                  |
-| `isMobileDevice`      | General mobile check                         | < 480px                   |
-| `isTabletDevice`      | General tablet check                         | 640px - 820px             |
-| `isDesktopDevice`     | General desktop check                        | ≥ 1024px                  |
-| `hasMediaQuery`       | Checks if MediaQuery is available in context | `true` inside widget tree |
-
-> **Note:** Context extensions use breakpoints from `ResponsiveConfig`. If not initialized, they use `Breakpoints.defaultBreakpoints`.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Yes. It supports RTL-aware layout and animation behavior for Arabic, Persian, Urdu and other right-to-left interfaces.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT. See [LICENSE](LICENSE).
 
-## Support
+## Links
 
-- 🐛 [Report Issues](https://github.com/awais305/responsive_flex_list/issues)
-- ⭐ [Star on GitHub](https://github.com/awais305/responsive_flex_list)
-- 💬 [Discussions](https://github.com/awais305/responsive_flex_list/discussions)
+- [GitHub](https://github.com/awais305/responsive_flex_list)
+- [Issues](https://github.com/awais305/responsive_flex_list/issues)

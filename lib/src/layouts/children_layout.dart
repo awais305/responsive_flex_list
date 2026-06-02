@@ -22,7 +22,7 @@ class ChildrenLayout extends BaseResponsiveLayout {
     super.physics,
     required super.reverse,
     super.primary,
-    super.cacheExtent,
+    super.scrollCacheExtent,
     required super.crossAxisCount,
     required super.maxStaggeredItems,
     super.crossAxisSpacing,
@@ -62,7 +62,7 @@ class ChildrenLayout extends BaseResponsiveLayout {
       physics: physics,
       reverse: reverse,
       primary: primary,
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: effectiveScrollCacheExtent,
       slivers: [
         SliverPadding(
           padding: padding ?? EdgeInsets.zero,

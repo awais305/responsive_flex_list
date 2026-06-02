@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:responsive_flex_list/responsive_flex_list.dart';
 
 void main() {
-  setUpAll(() {
+  setUp(() {
     ResponsiveConfig.init(breakpoints: Breakpoints.defaultBreakpoints);
   });
 
@@ -904,6 +904,273 @@ void main() {
           isNot(equals(item4Pos.dy))); // Item 3 should be on next row
 
       await tester.binding.setSurfaceSize(null);
+    });
+  });
+
+  group('Breakpoints model', () {
+    test('breakpoint_copy_with_preserves_extra_large_desktop', () {
+      final copied = Breakpoints.defaultBreakpoints.copyWith(
+        mobileColumns: 3,
+      );
+
+      expect(
+        copied.extraLargeDesktop,
+        equals(Breakpoints.defaultBreakpoints.extraLargeDesktop),
+      );
+      expect(
+        copied.extraLargeDesktopColumns,
+        equals(Breakpoints.defaultBreakpoints.extraLargeDesktopColumns),
+      );
+    });
+
+    test('breakpoint_merge_with_includes_extra_large_desktop', () {
+      const base = Breakpoints(
+        extraLargeDesktop: 1800,
+        extraLargeDesktopColumns: 9,
+      );
+
+      final merged = base.mergeWith(
+        const Breakpoints(
+          mobile: 420,
+          mobileColumns: 2,
+          extraLargeDesktop: 2000,
+          extraLargeDesktopColumns: 10,
+        ),
+      );
+
+      expect(merged.extraLargeDesktop, equals(2000));
+      expect(merged.extraLargeDesktopColumns, equals(10));
+    });
+
+    test('breakpoint_equality_includes_extra_large_desktop', () {
+      final first = Breakpoints.defaultBreakpoints.copyWith(
+        extraLargeDesktopColumns: 8,
+      );
+      final second = Breakpoints.defaultBreakpoints.copyWith(
+        extraLargeDesktopColumns: 9,
+      );
+
+      expect(first, isNot(equals(second)));
+      expect(first.hashCode, isNot(equals(second.hashCode)));
+    });
+  });
+
+  group('Responsive breakpoint resolution', () {
+    Future<void> pumpResponsiveList(
+      WidgetTester tester, {
+      required double width,
+      required int itemCount,
+    }) async {
+      await tester.binding.setSurfaceSize(Size(width, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexList(
+            children: List.generate(
+              itemCount,
+              (index) => SizedBox(height: 80, child: Text('Item $index')),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+    }
+
+    void expectColumnCount(WidgetTester tester, int columns) {
+      final firstRowY = tester.getCenter(find.text('Item 0')).dy;
+      for (int index = 1; index < columns; index++) {
+        expect(
+          tester.getCenter(find.text('Item $index')).dy,
+          equals(firstRowY),
+        );
+      }
+      expect(
+        tester.getCenter(find.text('Item $columns')).dy,
+        isNot(equals(firstRowY)),
+      );
+    }
+
+    testWidgets(
+        'width_below_mobile_resolves_as_small_mobile_when_small_mobile_is_defined',
+        (tester) async {
+      await pumpResponsiveList(tester, width: 300, itemCount: 2);
+
+      expectColumnCount(tester, 1);
+    });
+
+    testWidgets('mobile_resolves_between_mobile_and_small_tablet',
+        (tester) async {
+      await pumpResponsiveList(tester, width: 500, itemCount: 3);
+
+      expectColumnCount(tester, 2);
+    });
+
+    testWidgets('desktop_resolves_between_desktop_and_large_desktop',
+        (tester) async {
+      await pumpResponsiveList(tester, width: 1300, itemCount: 7);
+
+      expectColumnCount(tester, 6);
+    });
+
+    testWidgets(
+        'largeDesktop_resolves_between_largeDesktop_and_extraLargeDesktop',
+        (tester) async {
+      await pumpResponsiveList(tester, width: 1500, itemCount: 8);
+
+      expectColumnCount(tester, 7);
+    });
+
+    testWidgets('extraLargeDesktop_resolves_at_and_above_extraLargeDesktop',
+        (tester) async {
+      await pumpResponsiveList(tester, width: 1920, itemCount: 9);
+      expectColumnCount(tester, 8);
+
+      await pumpResponsiveList(tester, width: 2200, itemCount: 9);
+      expectColumnCount(tester, 8);
+    });
+
+    testWidgets('default_breakpoint_boundaries_select_expected_columns',
+        (tester) async {
+      await pumpResponsiveList(tester, width: 1023, itemCount: 6);
+      expectColumnCount(tester, Breakpoints.defaultBreakpoints.laptopColumns);
+
+      await pumpResponsiveList(tester, width: 1024, itemCount: 7);
+      expectColumnCount(tester, Breakpoints.defaultBreakpoints.desktopColumns);
+
+      await pumpResponsiveList(tester, width: 1439, itemCount: 7);
+      expectColumnCount(tester, Breakpoints.defaultBreakpoints.desktopColumns);
+
+      await pumpResponsiveList(tester, width: 1440, itemCount: 8);
+      expectColumnCount(
+        tester,
+        Breakpoints.defaultBreakpoints.largeDesktopColumns,
+      );
+
+      await pumpResponsiveList(tester, width: 1919, itemCount: 8);
+      expectColumnCount(
+        tester,
+        Breakpoints.defaultBreakpoints.largeDesktopColumns,
+      );
+
+      await pumpResponsiveList(tester, width: 1920, itemCount: 9);
+      expectColumnCount(
+        tester,
+        Breakpoints.defaultBreakpoints.extraLargeDesktopColumns,
+      );
+    });
+
+    testWidgets('context_helpers_use_exact_desktop_boundaries', (tester) async {
+      Future<void> expectFlagsAtWidth(
+        double width, {
+        required bool isLaptop,
+        required bool isDesktop,
+        required bool isLargeDesktop,
+        required bool isExtraLargeDesktop,
+      }) async {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = Size(width, 600);
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) {
+                return Column(
+                  children: [
+                    Text('laptop:${context.isLaptop}'),
+                    Text('desktop:${context.isDesktop}'),
+                    Text('large:${context.isLargeDesktop}'),
+                    Text('extra:${context.isExtraLargeDesktop}'),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+
+        expect(find.text('laptop:$isLaptop'), findsOneWidget);
+        expect(find.text('desktop:$isDesktop'), findsOneWidget);
+        expect(find.text('large:$isLargeDesktop'), findsOneWidget);
+        expect(find.text('extra:$isExtraLargeDesktop'), findsOneWidget);
+      }
+
+      await expectFlagsAtWidth(
+        1023,
+        isLaptop: true,
+        isDesktop: false,
+        isLargeDesktop: false,
+        isExtraLargeDesktop: false,
+      );
+      await expectFlagsAtWidth(
+        1024,
+        isLaptop: false,
+        isDesktop: true,
+        isLargeDesktop: false,
+        isExtraLargeDesktop: false,
+      );
+      await expectFlagsAtWidth(
+        1439,
+        isLaptop: false,
+        isDesktop: true,
+        isLargeDesktop: false,
+        isExtraLargeDesktop: false,
+      );
+      await expectFlagsAtWidth(
+        1440,
+        isLaptop: false,
+        isDesktop: false,
+        isLargeDesktop: true,
+        isExtraLargeDesktop: false,
+      );
+      await expectFlagsAtWidth(
+        1919,
+        isLaptop: false,
+        isDesktop: false,
+        isLargeDesktop: true,
+        isExtraLargeDesktop: false,
+      );
+      await expectFlagsAtWidth(
+        1920,
+        isLaptop: false,
+        isDesktop: false,
+        isLargeDesktop: false,
+        isExtraLargeDesktop: true,
+      );
+    });
+
+    testWidgets('context_extensions_use_latest_responsive_config',
+        (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(700, 600);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      Widget app() {
+        return MaterialApp(
+          home: Builder(
+            builder: (context) {
+              return Text(context.isTablet ? 'tablet' : 'not tablet');
+            },
+          ),
+        );
+      }
+
+      await tester.pumpWidget(app());
+      expect(find.text('not tablet'), findsOneWidget);
+
+      ResponsiveConfig.init(
+        breakpoints: Breakpoints.defaultBreakpoints.copyWith(tablet: 650),
+      );
+
+      await tester.pumpWidget(app());
+      expect(find.text('tablet'), findsOneWidget);
     });
   });
 }

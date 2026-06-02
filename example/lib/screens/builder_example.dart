@@ -67,7 +67,7 @@ Widget _buildCard(String fruit, int index) {
   return Card(
     elevation: 2,
     child: Container(
-      height: 100,
+      height: 120,
       padding: const EdgeInsets.all(12),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

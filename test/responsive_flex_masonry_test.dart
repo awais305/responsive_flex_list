@@ -166,6 +166,11 @@ void main() {
     testWidgets('cacheChildren flag controls rebuilds', (tester) async {
       int buildCount = 0;
 
+      Widget buildItem(BuildContext context, int index) {
+        buildCount++;
+        return Text('Item $index');
+      }
+
       // Helper stateful wrapper to force rebuilds via tap
       Widget makeApp({required bool cacheChildren}) {
         return StatefulBuilder(
@@ -175,10 +180,7 @@ void main() {
                 onTap: () => setState(() {}),
                 child: ResponsiveFlexMasonry.pinterest(
                   itemCount: 2,
-                  itemBuilder: (context, index) {
-                    buildCount++;
-                    return Text('Item $index');
-                  },
+                  itemBuilder: buildItem,
                   cacheChildren: cacheChildren,
                 ),
               ),
@@ -207,6 +209,254 @@ void main() {
       await tester.pump();
       // builder should not run again when cache is on
       expect(buildCount, equals(2));
+    });
+
+    testWidgets('rebuilds_pinterest_cache_when_cache_children_enabled_later',
+        (tester) async {
+      int buildCount = 0;
+
+      Widget buildItem(BuildContext context, int index) {
+        buildCount++;
+        return Text('Item $index');
+      }
+
+      Widget makeApp({required bool cacheChildren}) {
+        return MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 2,
+            itemBuilder: buildItem,
+            cacheChildren: cacheChildren,
+          ),
+        );
+      }
+
+      await tester.pumpWidget(makeApp(cacheChildren: false));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(2));
+
+      await tester.pumpWidget(makeApp(cacheChildren: true));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(4));
+      expect(find.text('Item 0'), findsOneWidget);
+      expect(find.text('Item 1'), findsOneWidget);
+    });
+
+    testWidgets('disables_pinterest_cache_when_cache_children_disabled_later',
+        (tester) async {
+      int buildCount = 0;
+      bool cacheChildren = true;
+
+      Widget buildItem(BuildContext context, int index) {
+        buildCount++;
+        return Text('Item $index');
+      }
+
+      await tester.pumpWidget(
+        StatefulBuilder(
+          builder: (context, setState) {
+            return MaterialApp(
+              home: GestureDetector(
+                onTap: () => setState(() {}),
+                onLongPress: () => setState(() => cacheChildren = false),
+                child: ResponsiveFlexMasonry.pinterest(
+                  itemCount: 2,
+                  itemBuilder: buildItem,
+                  cacheChildren: cacheChildren,
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(2));
+
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pump();
+      expect(buildCount, equals(2));
+
+      await tester.longPress(find.byType(GestureDetector));
+      await tester.pump();
+      expect(buildCount, equals(4));
+
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pump();
+      expect(buildCount, equals(6));
+    });
+
+    testWidgets(
+        'keeps_pinterest_cache_when_parent_rebuild_creates_new_inline_builder',
+        (tester) async {
+      int buildCount = 0;
+
+      await tester.pumpWidget(
+        StatefulBuilder(
+          builder: (context, setState) {
+            return MaterialApp(
+              home: GestureDetector(
+                onTap: () => setState(() {}),
+                child: ResponsiveFlexMasonry.pinterest(
+                  itemCount: 2,
+                  itemBuilder: (context, index) {
+                    buildCount++;
+                    return Text('Item $index');
+                  },
+                  cacheChildren: true,
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(2));
+
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pump();
+      expect(buildCount, equals(2));
+    });
+
+    testWidgets('rebuilds_pinterest_cache_when_widget_key_changes',
+        (tester) async {
+      int oldBuildCount = 0;
+      int newBuildCount = 0;
+
+      Widget oldBuilder(BuildContext context, int index) {
+        oldBuildCount++;
+        return Text('Old $index');
+      }
+
+      Widget newBuilder(BuildContext context, int index) {
+        newBuildCount++;
+        return Text('New $index');
+      }
+
+      Widget makeApp({
+        required Key key,
+        required ItemBuilder builder,
+      }) {
+        return MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            key: key,
+            itemCount: 2,
+            itemBuilder: builder,
+            cacheChildren: true,
+          ),
+        );
+      }
+
+      await tester.pumpWidget(
+        makeApp(key: const ValueKey('old-builder'), builder: oldBuilder),
+      );
+      await tester.pumpAndSettle();
+      expect(oldBuildCount, equals(2));
+      expect(find.text('Old 0'), findsOneWidget);
+
+      await tester.pumpWidget(
+        makeApp(key: const ValueKey('new-builder'), builder: newBuilder),
+      );
+      await tester.pumpAndSettle();
+      expect(newBuildCount, equals(2));
+      expect(find.text('New 0'), findsOneWidget);
+      expect(find.text('Old 0'), findsNothing);
+    });
+
+    testWidgets('keeps_pinterest_cache_when_inputs_are_unchanged',
+        (tester) async {
+      int buildCount = 0;
+
+      Widget buildItem(BuildContext context, int index) {
+        buildCount++;
+        return Text('Item $index');
+      }
+
+      await tester.pumpWidget(
+        StatefulBuilder(
+          builder: (context, setState) {
+            return MaterialApp(
+              home: GestureDetector(
+                onTap: () => setState(() {}),
+                child: ResponsiveFlexMasonry.pinterest(
+                  itemCount: 2,
+                  itemBuilder: buildItem,
+                  cacheChildren: true,
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(2));
+
+      await tester.tap(find.byType(GestureDetector));
+      await tester.pump();
+      expect(buildCount, equals(2));
+    });
+
+    testWidgets('appends_only_new_pinterest_cache_items_when_item_count_grows',
+        (tester) async {
+      int buildCount = 0;
+
+      Widget buildItem(BuildContext context, int index) {
+        buildCount++;
+        return Text('Item $index');
+      }
+
+      Widget makeApp({required int itemCount}) {
+        return MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: itemCount,
+            itemBuilder: buildItem,
+            cacheChildren: true,
+          ),
+        );
+      }
+
+      await tester.pumpWidget(makeApp(itemCount: 2));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(2));
+
+      await tester.pumpWidget(makeApp(itemCount: 4));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(4));
+      expect(find.text('Item 0'), findsOneWidget);
+      expect(find.text('Item 3'), findsOneWidget);
+    });
+
+    testWidgets('rebuilds_pinterest_cache_when_item_count_shrinks',
+        (tester) async {
+      int buildCount = 0;
+
+      Widget buildItem(BuildContext context, int index) {
+        buildCount++;
+        return Text('Item $index');
+      }
+
+      Widget makeApp({required int itemCount}) {
+        return MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: itemCount,
+            itemBuilder: buildItem,
+            cacheChildren: true,
+          ),
+        );
+      }
+
+      await tester.pumpWidget(makeApp(itemCount: 4));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(4));
+
+      await tester.pumpWidget(makeApp(itemCount: 2));
+      await tester.pumpAndSettle();
+      expect(buildCount, equals(6));
+      expect(find.text('Item 0'), findsOneWidget);
+      expect(find.text('Item 1'), findsOneWidget);
+      expect(find.text('Item 2'), findsNothing);
+      expect(find.text('Item 3'), findsNothing);
     });
 
     testWidgets('onLoadingProgress callback can be provided', (tester) async {

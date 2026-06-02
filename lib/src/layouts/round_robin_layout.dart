@@ -16,7 +16,7 @@ class RoundRobinLayout extends BaseResponsiveLayout {
     super.physics,
     super.controller,
     super.primary,
-    super.cacheExtent,
+    super.scrollCacheExtent,
     super.crossAxisSpacing,
     super.padding,
     super.crossAxisSeparator,
@@ -55,7 +55,7 @@ class RoundRobinLayout extends BaseResponsiveLayout {
       controller: controller,
       reverse: reverse,
       shrinkWrap: shrinkWrap,
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: effectiveScrollCacheExtent,
       slivers: [
         SliverPadding(
           padding: padding ?? EdgeInsets.zero,

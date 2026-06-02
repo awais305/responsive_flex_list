@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:responsive_flex_list/src/config/responsive_config.dart';
 import 'package:responsive_flex_list/src/models/breakpoints.dart';
 
-Breakpoints _breakpoints = ResponsiveConfig.breakpoints;
-
 /// Convenience getters for screen size and breakpoint checks.
 ///
 /// Example:
@@ -14,6 +12,8 @@ Breakpoints _breakpoints = ResponsiveConfig.breakpoints;
 /// ```
 
 extension ScreenSize on BuildContext {
+  Breakpoints get _breakpoints => ResponsiveConfig.breakpoints;
+
   /// Returns `true` if [MediaQuery] is not available (e.g., outside a widget tree).
   bool get hasMediaQuery {
     try {
@@ -27,7 +27,7 @@ extension ScreenSize on BuildContext {
   double get screenWidth => MediaQuery.sizeOf(this).width;
   double get screenHeight => MediaQuery.sizeOf(this).height;
 
-  // Helper to find the next defined breakpoint value
+  // Helper to find the next defined breakpoint value.
   double? _getNextBreakpoint(List<double?> breakpoints) {
     for (final bp in breakpoints) {
       if (bp != null) return bp;
@@ -35,75 +35,104 @@ extension ScreenSize on BuildContext {
     return null;
   }
 
-  // Individual size checks - only return true if the breakpoint is defined
+  bool _isInBreakpointRange(double? lowerBound, List<double?> nextBreakpoints) {
+    if (lowerBound == null) return false;
+    final upperBound = _getNextBreakpoint(nextBreakpoints);
+    return screenWidth >= lowerBound &&
+        (upperBound == null || screenWidth < upperBound);
+  }
+
+  bool _isSmallestBreakpointRange(
+    double? breakpoint,
+    List<double?> nextBreakpoints,
+  ) {
+    if (breakpoint == null) return false;
+    final upperBound = _getNextBreakpoint(nextBreakpoints);
+    if (upperBound == null) return screenWidth >= breakpoint;
+    return screenWidth < upperBound;
+  }
+
+  // Individual size checks - only return true if the breakpoint is defined.
   bool get isSmallMobile {
-    if (_breakpoints.smallMobile == null) return false;
-    final upperBound = _breakpoints.mobile ??
-        _breakpoints.smallTablet ??
-        _breakpoints.tablet ??
-        double.infinity;
-    return screenWidth < _breakpoints.smallMobile! && screenWidth < upperBound;
+    return _isSmallestBreakpointRange(
+      _breakpoints.smallMobile,
+      [
+        _breakpoints.mobile,
+        _breakpoints.smallTablet,
+        _breakpoints.tablet,
+        _breakpoints.laptop,
+        _breakpoints.desktop,
+        _breakpoints.largeDesktop,
+        _breakpoints.extraLargeDesktop,
+      ],
+    );
   }
 
   bool get isMobile {
-    if (_breakpoints.mobile == null) return false;
-    final upperBound = _getNextBreakpoint([
-          _breakpoints.smallTablet,
-          _breakpoints.tablet,
-          _breakpoints.laptop,
-        ]) ??
-        double.infinity;
-    return screenWidth >= _breakpoints.mobile! && screenWidth < upperBound;
+    return _isInBreakpointRange(
+      _breakpoints.mobile,
+      [
+        _breakpoints.smallTablet,
+        _breakpoints.tablet,
+        _breakpoints.laptop,
+        _breakpoints.desktop,
+        _breakpoints.largeDesktop,
+        _breakpoints.extraLargeDesktop,
+      ],
+    );
   }
 
   bool get isSmallTablet {
-    if (_breakpoints.smallTablet == null) return false;
-    final upperBound = _getNextBreakpoint([
-          _breakpoints.tablet,
-          _breakpoints.laptop,
-          _breakpoints.desktop,
-        ]) ??
-        double.infinity;
-    return screenWidth >= _breakpoints.smallTablet! && screenWidth < upperBound;
+    return _isInBreakpointRange(
+      _breakpoints.smallTablet,
+      [
+        _breakpoints.tablet,
+        _breakpoints.laptop,
+        _breakpoints.desktop,
+        _breakpoints.largeDesktop,
+        _breakpoints.extraLargeDesktop,
+      ],
+    );
   }
 
   bool get isTablet {
-    if (_breakpoints.tablet == null) return false;
-    final upperBound = _getNextBreakpoint([
-          _breakpoints.laptop,
-          _breakpoints.desktop,
-          _breakpoints.largeDesktop,
-        ]) ??
-        double.infinity;
-    return screenWidth >= _breakpoints.tablet! && screenWidth < upperBound;
+    return _isInBreakpointRange(
+      _breakpoints.tablet,
+      [
+        _breakpoints.laptop,
+        _breakpoints.desktop,
+        _breakpoints.largeDesktop,
+        _breakpoints.extraLargeDesktop,
+      ],
+    );
   }
 
   bool get isLaptop {
-    if (_breakpoints.laptop == null) return false;
-    final upperBound = _getNextBreakpoint([
-          _breakpoints.desktop,
-          _breakpoints.largeDesktop,
-          _breakpoints.extraLargeDesktop,
-        ]) ??
-        double.infinity;
-    return screenWidth >= _breakpoints.laptop! && screenWidth < upperBound;
+    return _isInBreakpointRange(
+      _breakpoints.laptop,
+      [
+        _breakpoints.desktop,
+        _breakpoints.largeDesktop,
+        _breakpoints.extraLargeDesktop,
+      ],
+    );
   }
 
   bool get isDesktop {
-    if (_breakpoints.desktop == null) return false;
-    final upperBound = _getNextBreakpoint([
-          _breakpoints.largeDesktop,
-          _breakpoints.extraLargeDesktop,
-        ]) ??
-        double.infinity;
-    return screenWidth >= _breakpoints.desktop! && screenWidth < upperBound;
+    return _isInBreakpointRange(
+      _breakpoints.desktop,
+      [
+        _breakpoints.largeDesktop,
+        _breakpoints.extraLargeDesktop,
+      ],
+    );
   }
 
   bool get isLargeDesktop {
-    if (_breakpoints.largeDesktop == null) return false;
-    final upperBound = _breakpoints.extraLargeDesktop ?? double.infinity;
-    return screenWidth >= _breakpoints.largeDesktop! &&
-        screenWidth < upperBound;
+    return _isInBreakpointRange(
+      _breakpoints.largeDesktop,
+      [_breakpoints.extraLargeDesktop],
+    );
   }
 
   bool get isExtraLargeDesktop {
@@ -111,53 +140,28 @@ extension ScreenSize on BuildContext {
     return screenWidth >= _breakpoints.extraLargeDesktop!;
   }
 
-  /// General checks, if you want to implement at all screen sizes for same category
-  bool get isMobileDevice {
-    // Only return true if at least one mobile breakpoint is defined
-    if (_breakpoints.smallMobile == null && _breakpoints.mobile == null) {
-      return false;
-    }
-
-    final upperBound = _getNextBreakpoint([
-          _breakpoints.mobile,
-          _breakpoints.smallTablet,
-          _breakpoints.tablet,
-        ]) ??
-        double.infinity;
-    return screenWidth < upperBound;
+  /// Returns `true` when the current width is in a phone-sized layout range.
+  ///
+  /// This combines [isSmallMobile] and [isMobile]. It is a breakpoint-width
+  /// helper, not physical device detection.
+  bool get isMobileRange {
+    return isSmallMobile || isMobile;
   }
 
-  bool get isTabletDevice {
-    // Only return true if at least one tablet breakpoint is defined
-    if (_breakpoints.smallTablet == null && _breakpoints.tablet == null) {
-      return false;
-    }
-
-    final lowerBound = _breakpoints.mobile ?? _breakpoints.smallMobile ?? 0;
-    final upperBound = _getNextBreakpoint([
-          _breakpoints.tablet,
-          _breakpoints.laptop,
-          _breakpoints.desktop,
-        ]) ??
-        double.infinity;
-    return screenWidth >= lowerBound && screenWidth < upperBound;
+  /// Returns `true` when the current width is in a tablet-sized layout range.
+  ///
+  /// This combines [isSmallTablet] and [isTablet]. It is a breakpoint-width
+  /// helper, not physical device detection.
+  bool get isTabletRange {
+    return isSmallTablet || isTablet;
   }
 
-  bool get isDesktopDevice {
-    // Only return true if at least one desktop breakpoint is defined
-    if (_breakpoints.laptop == null &&
-        _breakpoints.desktop == null &&
-        _breakpoints.largeDesktop == null &&
-        _breakpoints.extraLargeDesktop == null) {
-      return false;
-    }
-
-    final lowerBound = _getNextBreakpoint([
-          _breakpoints.laptop,
-          _breakpoints.desktop,
-          _breakpoints.largeDesktop,
-        ]) ??
-        0;
-    return screenWidth >= lowerBound;
+  /// Returns `true` when the current width is in a desktop-sized layout range.
+  ///
+  /// This combines [isLaptop], [isDesktop], [isLargeDesktop], and
+  /// [isExtraLargeDesktop]. It is a breakpoint-width helper, not physical
+  /// device detection.
+  bool get isDesktopRange {
+    return isLaptop || isDesktop || isLargeDesktop || isExtraLargeDesktop;
   }
 }

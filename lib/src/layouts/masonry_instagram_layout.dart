@@ -47,7 +47,7 @@ class InstagramLayout extends BaseResponsiveLayout {
       physics: physics,
       shrinkWrap: shrinkWrap,
       controller: controller,
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: effectiveScrollCacheExtent,
       slivers: [
         // Wrap the grid in SliverPadding to apply optional padding
         SliverPadding(

@@ -74,7 +74,7 @@ class _SeparatorExampleState extends State<SeparatorExample> {
       ),
       body: Column(
         children: [
-          if (!context.isMobileDevice)
+          if (!context.isMobileRange)
             Wrap(
               spacing: 50,
               children: [

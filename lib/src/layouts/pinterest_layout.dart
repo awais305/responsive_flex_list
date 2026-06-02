@@ -40,7 +40,7 @@ class PinterestLayout extends BaseResponsiveLayout {
     required super.reverse,
     super.controller,
     super.primary,
-    super.cacheExtent,
+    super.scrollCacheExtent,
   }) : super(useIntrinsicHeight: false);
 
   @override
@@ -55,7 +55,7 @@ class PinterestLayout extends BaseResponsiveLayout {
       controller: controller,
       reverse: reverse,
       shrinkWrap: shrinkWrap,
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: effectiveScrollCacheExtent,
       slivers: [
         SliverPadding(
           padding: padding ?? const EdgeInsets.all(4),

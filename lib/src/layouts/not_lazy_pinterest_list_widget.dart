@@ -265,17 +265,34 @@ class _NotLazyPinterestListWidgetState
     super.didUpdateWidget(oldWidget);
 
     final int newLength = widget.itemCount;
+    final bool cacheEnabledLater =
+        !oldWidget.cacheChildren && widget.cacheChildren;
+    final bool cacheDisabled = oldWidget.cacheChildren && !widget.cacheChildren;
     final bool columnCountChanged =
         _previousCrossAxisCount != widget.crossAxisCount;
     final bool itemsChanged = _previousItemCount != newLength;
 
     // When caching disabled, force rebuild on any changes
     if (!widget.cacheChildren) {
+      if (cacheDisabled) {
+        _cachedChildren = [];
+      }
       if (itemsChanged || columnCountChanged) {
         _previousItemCount = newLength;
         _previousCrossAxisCount = widget.crossAxisCount;
         setState(() {});
       }
+      return;
+    }
+
+    // Do not invalidate only because itemBuilder has a new function identity:
+    // inline builders are recreated on ordinary parent rebuilds.
+    if (cacheEnabledLater) {
+      _cachedChildren = [];
+      _buildChildrenList(0, newLength);
+      _previousCrossAxisCount = widget.crossAxisCount;
+      _previousItemCount = newLength;
+      _startImageTracking();
       return;
     }
 

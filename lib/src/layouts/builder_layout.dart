@@ -15,8 +15,8 @@ class BuilderLayout extends BaseResponsiveLayout {
     required super.shrinkWrap,
     required super.reverse,
     super.primary,
-    super.cacheExtent,
-    required double mainAxisSpacing,
+    super.scrollCacheExtent,
+    required super.mainAxisSpacing,
     super.crossAxisSpacing,
     required super.useIntrinsicHeight,
     required super.isRTL,
@@ -30,7 +30,7 @@ class BuilderLayout extends BaseResponsiveLayout {
     super.childAspectRatio,
     super.mainAxisExtent,
     super.items,
-  }) : super(mainAxisSpacing: mainAxisSpacing);
+  });
 
   @override
   String getItemBuilderNullError() {
@@ -46,7 +46,7 @@ class BuilderLayout extends BaseResponsiveLayout {
       physics: physics,
       reverse: reverse,
       primary: primary,
-      cacheExtent: cacheExtent,
+      scrollCacheExtent: effectiveScrollCacheExtent,
       slivers: [
         SliverPadding(
           padding: padding ?? EdgeInsets.zero,
