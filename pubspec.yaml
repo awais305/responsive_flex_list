@@ -24,3 +24,13 @@ topics:
   - masonry
   - layout
   - flutter-web
+
+screenshots:
+  - description: Responsive list to grid demo.
+    path: assets/demo.gif
+
+  - description: Pinterest-style masonry layout.
+    path: assets/pinterest.png
+
+  - description: Instagram-style masonry layout.
+    path: assets/instagram.png

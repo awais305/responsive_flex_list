@@ -59,8 +59,8 @@ final List<String> fruits = [
   '🍑 Peach',
   '🍐 Pear',
   '🍍 Pineapple',
-  '🍓 Strawberry',
-  '🍉 Watermelon',
+  // '🍓 Strawberry',
+  // '🍉 Watermelon',
 ];
 
 Widget _buildCard(String fruit, int index) {

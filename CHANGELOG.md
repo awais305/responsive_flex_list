@@ -1,35 +1,35 @@
 ## [1.4.0] - 02 Jun 2026
 
-### Migration Notes
+#### Migration Notes
+___
 
 - Raised the minimum SDK versions to Dart `>=3.6.0` and Flutter `>=3.27.0`.
 - Renamed `cacheExtent` to `scrollCacheExtent` to match Flutter's `CustomScrollView` API. Replace `cacheExtent: ...` with `scrollCacheExtent: ...`.
 - Updated default breakpoint ranges. Desktop now starts at `1024px`, large desktop at `1440px`, and extra-large desktop at `1920px`.
 
-### Fixes
+#### Fixes
+___
 
-#### Breakpoints
-
+##### Breakpoints
 - Fixed matching so each range now uses consistent lower-bound behavior.
 - Fixed extra-large desktop handling across resolution, `copyWith`, `mergeWith`, equality, `hashCode`, and `toString`.
 
-#### Context Helpers
-
+##### Context Helpers
 - Updated size helpers to use the latest `ResponsiveConfig.breakpoints`.
 - Corrected desktop boundary checks for `context.isDesktop`, `context.isLargeDesktop`, and `context.isExtraLargeDesktop`.
 
-#### Pinterest Masonry
-
+##### Pinterest Masonry
 - Fixed child caching when `cacheChildren` changes after the first build.
 - Prevented unnecessary cache rebuilds caused by inline `itemBuilder` closures.
 - Fixed cache updates when item counts increase or decrease.
 
-#### Scroll Cache
+##### Builder Layout
+- Fixed incomplete last-row alignment in `ResponsiveFlexList.builder` by preserving cross-axis spacing for empty column slots.
 
+##### Scroll Cache
 - Fixed `scrollCacheExtent` forwarding across standard, separator, masonry, and round-robin layouts.
 
-### Performance
-
+#### Performance
 - Improved Pinterest masonry caching so cached children are preserved across normal parent rebuilds.
 
 ## [1.3.0] - 13 Mar 2026

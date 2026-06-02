@@ -62,6 +62,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.crossAxisSpacing = 1,
     super.minCrossAxisCount,
     super.maxCrossAxisCount,
+    super.gridDelegate,
   })  : assert(
           animationDuration == null ||
               (animationType != AnimationType.none ||
@@ -78,12 +79,11 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
           type: ResponsiveListType.instagram,
         );
 
-  /// Non-lazy Pinterest-style masonry grid widget that pre-builds all items for optimal performance.
+  /// Non-lazy Pinterest-style masonry grid widget for bounded collections.
   ///
-  /// Unlike lazy loading approaches, this widget builds and caches all children upfront,
-  /// making it ideal for lists where all items need to be rendered immediately or when
-  /// smooth scrolling with complex animations is required. Intelligently handles updates
-  /// by appending only new items when possible, avoiding full rebuilds.
+  /// Unlike lazy loading approaches, this widget builds and can cache all
+  /// children upfront. That keeps item positions stable, but it is best suited
+  /// to small and medium collections rather than infinite feeds.
   ///
   const ResponsiveFlexMasonry.pinterest({
     super.key,
@@ -113,6 +113,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.cacheChildren,
     super.minCrossAxisCount,
     super.maxCrossAxisCount,
+    super.gridDelegate,
   })  : assert(
           animationDuration == null ||
               (animationType != AnimationType.none ||

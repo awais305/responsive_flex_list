@@ -6,7 +6,7 @@ import 'package:responsive_flex_list/src/widgets/base_responsive_widget.dart';
 /// based on screen breakpoints.
 ///
 /// This widget creates a grid-like layout that adapts to different screen sizes
-/// by changing the number of columns displayed. It supports four different
+/// by changing the number of columns displayed. It supports three
 /// construction patterns:
 ///
 /// 1. **Default constructor**: Renders a fixed list of child widgets.
@@ -50,14 +50,14 @@ import 'package:responsive_flex_list/src/widgets/base_responsive_widget.dart';
 /// The widget automatically determines how many columns to display based on
 /// the screen width and the configured breakpoints. By default:
 /// ```
-/// | Small Mobile        | < 320px   | List (1 column)  |
-/// | Mobile              | < 480px   | Grid (2 columns) |
-/// | Small Tablet        | < 640px   | Grid (3 columns) |
-/// | Tablet              | < 820px   | Grid (4 columns) |
-/// | Laptop              | < 1024px  | Grid (5 columns) |
-/// | Desktop             | < 1280px  | Grid (6 columns) |
-/// | Large Desktop       | < 1440px  | Grid (7 columns) |
-/// | Extra Large Desktop | < 1920px  | Grid (8 columns) |
+/// | Small Mobile        | < 480px                 | List (1 column)  |
+/// | Mobile              | >= 480px and < 640px   | Grid (2 columns) |
+/// | Small Tablet        | >= 640px and < 768px   | Grid (3 columns) |
+/// | Tablet              | >= 768px and < 820px   | Grid (4 columns) |
+/// | Laptop              | >= 820px and < 1024px  | Grid (5 columns) |
+/// | Desktop             | >= 1024px and < 1440px | Grid (6 columns) |
+/// | Large Desktop       | >= 1440px and < 1920px | Grid (7 columns) |
+/// | Extra Large Desktop | >= 1920px              | Grid (8 columns) |
 ///
 /// ```
 
@@ -204,11 +204,11 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
           roundRobinLayout: false,
         );
 
-  /// Creates a responsive list view where rows are axisSeparator by a separator.
+  /// Creates a responsive list view where rows are separated by separators.
   ///
   /// This constructor is similar to the builder constructor, but adds
-  /// separators between each row of items. This is useful when you want
-  /// visual separation between rows.
+  /// separators between rows and, in multi-column layouts, optionally between
+  /// columns.
   ///
   /// The [itemCount] and [itemBuilder] parameters are required.
   ///
@@ -227,7 +227,7 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.itemBuilder,
     @Deprecated('Use itemCount instead') super.items,
     required super.mainAxisSeparator,
-    required super.crossAxisSeparator,
+    super.crossAxisSeparator,
     @Deprecated('Use gridDelegate.crossAxisCount instead') super.crossAxisCount,
     super.padding,
     super.physics,

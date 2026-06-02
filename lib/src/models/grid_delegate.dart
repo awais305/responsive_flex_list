@@ -36,12 +36,86 @@ class ResponsiveFlexGridDelegate {
   /// If this is non-null, [childAspectRatio] is ignored.
   final double? mainAxisExtent;
 
-  const ResponsiveFlexGridDelegate(
-      {this.crossAxisSpacing,
-      this.mainAxisSpacing,
-      this.crossAxisCount,
-      this.minCrossAxisCount,
-      this.maxCrossAxisCount,
-      this.childAspectRatio,
-      this.mainAxisExtent});
+  const ResponsiveFlexGridDelegate({
+    this.crossAxisSpacing,
+    this.mainAxisSpacing,
+    this.crossAxisCount,
+    this.minCrossAxisCount,
+    this.maxCrossAxisCount,
+    this.childAspectRatio,
+    this.mainAxisExtent,
+  })  : assert(
+          crossAxisSpacing == null || crossAxisSpacing >= 0,
+          'crossAxisSpacing must be greater than or equal to zero',
+        ),
+        assert(
+          mainAxisSpacing == null || mainAxisSpacing >= 0,
+          'mainAxisSpacing must be greater than or equal to zero',
+        ),
+        assert(
+          crossAxisCount == null || crossAxisCount > 0,
+          'crossAxisCount must be greater than zero',
+        ),
+        assert(
+          minCrossAxisCount == null || minCrossAxisCount > 0,
+          'minCrossAxisCount must be greater than zero',
+        ),
+        assert(
+          maxCrossAxisCount == null || maxCrossAxisCount > 0,
+          'maxCrossAxisCount must be greater than zero',
+        ),
+        assert(
+          minCrossAxisCount == null ||
+              maxCrossAxisCount == null ||
+              minCrossAxisCount <= maxCrossAxisCount,
+          'minCrossAxisCount cannot be greater than maxCrossAxisCount',
+        ),
+        assert(
+          childAspectRatio == null || childAspectRatio > 0,
+          'childAspectRatio must be greater than zero',
+        ),
+        assert(
+          mainAxisExtent == null || mainAxisExtent > 0,
+          'mainAxisExtent must be greater than zero',
+        );
+
+  @override
+  String toString() {
+    return 'ResponsiveFlexGridDelegate('
+        'crossAxisSpacing: $crossAxisSpacing, '
+        'mainAxisSpacing: $mainAxisSpacing, '
+        'crossAxisCount: $crossAxisCount, '
+        'minCrossAxisCount: $minCrossAxisCount, '
+        'maxCrossAxisCount: $maxCrossAxisCount, '
+        'childAspectRatio: $childAspectRatio, '
+        'mainAxisExtent: $mainAxisExtent'
+        ')';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ResponsiveFlexGridDelegate) return false;
+
+    return crossAxisSpacing == other.crossAxisSpacing &&
+        mainAxisSpacing == other.mainAxisSpacing &&
+        crossAxisCount == other.crossAxisCount &&
+        minCrossAxisCount == other.minCrossAxisCount &&
+        maxCrossAxisCount == other.maxCrossAxisCount &&
+        childAspectRatio == other.childAspectRatio &&
+        mainAxisExtent == other.mainAxisExtent;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      crossAxisSpacing,
+      mainAxisSpacing,
+      crossAxisCount,
+      minCrossAxisCount,
+      maxCrossAxisCount,
+      childAspectRatio,
+      mainAxisExtent,
+    );
+  }
 }

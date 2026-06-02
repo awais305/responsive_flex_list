@@ -3,12 +3,12 @@ import 'package:flutter/rendering.dart';
 
 import 'package:responsive_flex_list/src/core/core.dart';
 
-/// Non-lazy Pinterest-style masonry grid widget that pre-builds all items for optimal performance.
+/// Non-lazy Pinterest-style masonry grid widget for bounded collections.
 ///
 /// Unlike lazy loading approaches, this widget builds and caches all children upfront,
-/// making it ideal for lists where all items need to be rendered immediately or when
-/// smooth scrolling with complex animations is required. Intelligently handles updates
-/// by appending only new items when possible, avoiding full rebuilds.
+/// which keeps item positions stable but increases initial work and memory use.
+/// It intelligently appends new items when possible, avoiding unnecessary full
+/// rebuilds for growing collections.
 class NotLazyPinterestListWidget extends StatefulWidget {
   /// Number of items to display in the masonry grid.
   final int itemCount;

@@ -413,6 +413,34 @@ void main() {
         // Only visible items will be found
         expect(find.text('Item 0'), findsOneWidget);
       });
+
+      testWidgets('keeps last row item width aligned with full rows',
+          (tester) async {
+        await tester.binding.setSurfaceSize(const Size(390, 600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ResponsiveFlexList.builder(
+              crossAxisCount: 3,
+              crossAxisSpacing: 30,
+              itemCount: 4,
+              itemBuilder: (context, index) => SizedBox(
+                key: ValueKey('item-$index'),
+                height: 80,
+                child: Text('Item $index'),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        expect(
+          tester.getSize(find.byKey(const ValueKey('item-3'))).width,
+          equals(tester.getSize(find.byKey(const ValueKey('item-0'))).width),
+        );
+      });
     });
 
     group('default spacing', () {
@@ -1061,6 +1089,33 @@ void main() {
       );
     });
 
+    testWidgets('default_breakpoint_edges_select_expected_columns',
+        (tester) async {
+      final expectedColumnsByWidth = <double, int>{
+        0: 1,
+        599: 2,
+        600: 2,
+        819: 4,
+        820: 5,
+        1023: 5,
+        1024: 6,
+        1439: 6,
+        1440: 7,
+        1919: 7,
+        1920: 8,
+      };
+
+      for (final entry in expectedColumnsByWidth.entries) {
+        await pumpResponsiveList(
+          tester,
+          width: entry.key,
+          itemCount: entry.value + 1,
+        );
+
+        expectColumnCount(tester, entry.value);
+      }
+    });
+
     testWidgets('context_helpers_use_exact_desktop_boundaries', (tester) async {
       Future<void> expectFlagsAtWidth(
         double width, {
@@ -1171,6 +1226,243 @@ void main() {
 
       await tester.pumpWidget(app());
       expect(find.text('tablet'), findsOneWidget);
+    });
+  });
+
+  group('Layout validation', () {
+    test('responsive_flex_grid_delegate_rejects_invalid_values', () {
+      expect(
+        () => ResponsiveFlexGridDelegate(crossAxisCount: 0),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexGridDelegate(minCrossAxisCount: 0),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexGridDelegate(maxCrossAxisCount: 0),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexGridDelegate(
+          minCrossAxisCount: 4,
+          maxCrossAxisCount: 2,
+        ),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexGridDelegate(crossAxisSpacing: -1),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexGridDelegate(childAspectRatio: 0),
+        throwsAssertionError,
+      );
+    });
+
+    test('responsive_flex_grid_delegate_has_value_semantics', () {
+      const first = ResponsiveFlexGridDelegate(
+        crossAxisCount: 3,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 12,
+      );
+      const second = ResponsiveFlexGridDelegate(
+        crossAxisCount: 3,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 12,
+      );
+      const third = ResponsiveFlexGridDelegate(crossAxisCount: 4);
+
+      expect(first, equals(second));
+      expect(first.hashCode, equals(second.hashCode));
+      expect(first, isNot(equals(third)));
+      expect(first.toString(), contains('crossAxisCount: 3'));
+    });
+
+    testWidgets('responsive_flex_list_rejects_invalid_layout_values',
+        (tester) async {
+      expect(
+        () => ResponsiveFlexList.builder(
+          itemCount: -1,
+          itemBuilder: (context, index) => Text('Item $index'),
+        ),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexList.builder(
+          crossAxisCount: 0,
+          itemCount: 1,
+          itemBuilder: (context, index) => Text('Item $index'),
+        ),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexList.builder(
+          minCrossAxisCount: 4,
+          maxCrossAxisCount: 2,
+          itemCount: 1,
+          itemBuilder: (context, index) => Text('Item $index'),
+        ),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveFlexList.builder(
+          scrollCacheExtent: -1,
+          itemCount: 1,
+          itemBuilder: (context, index) => Text('Item $index'),
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    testWidgets('with_separators_allows_null_cross_axis_separator',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexList.withSeparators(
+            crossAxisCount: 1,
+            itemCount: 3,
+            itemBuilder: (context, index) => Text('Item $index'),
+            mainAxisSeparator: (index, total) => const Divider(),
+          ),
+        ),
+      );
+
+      expect(find.text('Item 0'), findsOneWidget);
+      expect(find.byType(Divider), findsWidgets);
+      expect(find.byType(VerticalDivider), findsNothing);
+    });
+
+    testWidgets('scroll_cache_extent_forwards_to_public_scroll_views',
+        (tester) async {
+      Future<void> expectForwarded(Widget widget) async {
+        await tester.pumpWidget(MaterialApp(home: widget));
+        await tester.pumpAndSettle();
+
+        final scrollView = tester.widget<CustomScrollView>(
+          find
+              .descendant(
+                of: find.byWidget(widget),
+                matching: find.byType(CustomScrollView),
+              )
+              .first,
+        );
+
+        expect(scrollView.scrollCacheExtent, isNotNull);
+      }
+
+      await expectForwarded(
+        ResponsiveFlexList.builder(
+          itemCount: 3,
+          scrollCacheExtent: 300,
+          itemBuilder: (context, index) => Text('Builder $index'),
+        ),
+      );
+
+      await expectForwarded(
+        ResponsiveFlexList(
+          scrollCacheExtent: 300,
+          children: List.generate(3, (index) => Text('Child $index')),
+        ),
+      );
+
+      await expectForwarded(
+        ResponsiveFlexList.withSeparators(
+          itemCount: 3,
+          scrollCacheExtent: 300,
+          itemBuilder: (context, index) => Text('Separator $index'),
+          mainAxisSeparator: (index, total) => const Divider(),
+        ),
+      );
+
+      await expectForwarded(
+        ResponsiveFlexMasonry.pinterest(
+          itemCount: 3,
+          scrollCacheExtent: 300,
+          itemBuilder: (context, index) => Text('Pinterest $index'),
+        ),
+      );
+    });
+  });
+
+  group('Delegate behavior', () {
+    testWidgets('grid_delegate_overrides_deprecated_layout_parameters',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(900, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexList(
+            crossAxisCount: 1,
+            gridDelegate: const ResponsiveFlexGridDelegate(
+              crossAxisCount: 3,
+            ),
+            children: List.generate(
+              4,
+              (index) => SizedBox(height: 80, child: Text('Item $index')),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstRowY = tester.getCenter(find.text('Item 0')).dy;
+      expect(tester.getCenter(find.text('Item 1')).dy, equals(firstRowY));
+      expect(tester.getCenter(find.text('Item 2')).dy, equals(firstRowY));
+      expect(
+          tester.getCenter(find.text('Item 3')).dy, isNot(equals(firstRowY)));
+    });
+
+    testWidgets('masonry_grid_delegate_controls_column_boundaries',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 3,
+            gridDelegate: const ResponsiveFlexGridDelegate(
+              minCrossAxisCount: 3,
+            ),
+            itemBuilder: (context, index) => SizedBox(
+              height: 80,
+              child: Text('Item $index'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstRowY = tester.getTopLeft(find.text('Item 0')).dy;
+      expect(tester.getTopLeft(find.text('Item 1')).dy, equals(firstRowY));
+      expect(tester.getTopLeft(find.text('Item 2')).dy, equals(firstRowY));
+    });
+
+    testWidgets('masonry_grid_delegate_ignores_fixed_item_sizing',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 1,
+            gridDelegate: const ResponsiveFlexGridDelegate(
+              childAspectRatio: 1,
+              mainAxisExtent: 100,
+            ),
+            itemBuilder: (context, index) => const SizedBox(
+              height: 80,
+              child: Text('Item'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Item'), findsOneWidget);
     });
   });
 }

@@ -48,7 +48,57 @@ class BaseResponsiveWidget extends StatefulWidget {
     @Deprecated(
         'Use itemCount instead. If provided, itemCount will be items.length.')
     this.items,
-  }) : itemCount = itemCount ?? items?.length ?? 0;
+  })  : assert(
+          itemCount == null || itemCount >= 0,
+          'itemCount must be greater than or equal to zero',
+        ),
+        assert(
+          crossAxisCount == null || crossAxisCount > 0,
+          'crossAxisCount must be greater than zero',
+        ),
+        assert(
+          minCrossAxisCount == null || minCrossAxisCount > 0,
+          'minCrossAxisCount must be greater than zero',
+        ),
+        assert(
+          maxCrossAxisCount == null || maxCrossAxisCount > 0,
+          'maxCrossAxisCount must be greater than zero',
+        ),
+        assert(
+          minCrossAxisCount == null ||
+              maxCrossAxisCount == null ||
+              minCrossAxisCount <= maxCrossAxisCount,
+          'minCrossAxisCount cannot be greater than maxCrossAxisCount',
+        ),
+        assert(
+          mainAxisSpacing == null || mainAxisSpacing >= 0,
+          'mainAxisSpacing must be greater than or equal to zero',
+        ),
+        assert(
+          crossAxisSpacing == null || crossAxisSpacing >= 0,
+          'crossAxisSpacing must be greater than or equal to zero',
+        ),
+        assert(
+          childAspectRatio == null || childAspectRatio > 0,
+          'childAspectRatio must be greater than zero',
+        ),
+        assert(
+          mainAxisExtent == null || mainAxisExtent > 0,
+          'mainAxisExtent must be greater than zero',
+        ),
+        assert(
+          maxRowHeight == null || maxRowHeight > 0,
+          'maxRowHeight must be greater than zero',
+        ),
+        assert(
+          maxRowHeightMultiplier > 0,
+          'maxRowHeightMultiplier must be greater than zero',
+        ),
+        assert(
+          scrollCacheExtent == null || scrollCacheExtent >= 0,
+          'scrollCacheExtent must be greater than or equal to zero',
+        ),
+        itemCount = itemCount ?? items?.length ?? 0;
 
   /// Fixed number of columns. If null, determined automatically based on breakpoints.
   final int? crossAxisCount;
@@ -253,7 +303,7 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
   Widget build(BuildContext context) {
     Widget child = LayoutBuilder(
       builder: (context, constraints) {
-        crossAxisCount = _getcrossAxisCount(constraints);
+        crossAxisCount = _getCrossAxisCount(constraints);
         maxStaggeredItems = _getMaxStaggeredItems(crossAxisCount);
 
         return buildAnimatedLayout(
@@ -358,11 +408,11 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
   }
 
   /// Calculates column count based on screen width and breakpoints.
-  int _getcrossAxisCount(BoxConstraints constraints) {
+  int _getCrossAxisCount(BoxConstraints constraints) {
     final effectiveCrossAxisCount =
         widget.gridDelegate?.crossAxisCount ?? widget.crossAxisCount;
     if (effectiveCrossAxisCount != null) {
-      return effectiveCrossAxisCount.clamp(1, double.infinity).toInt();
+      return effectiveCrossAxisCount;
     }
 
     final screenWidth = constraints.maxWidth;

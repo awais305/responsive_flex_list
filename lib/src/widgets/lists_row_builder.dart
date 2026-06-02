@@ -156,9 +156,9 @@ class ListsRowBuilder extends StatelessWidget {
           break;
       }
 
-      // Add vertical separator between items (except after last item)
-      // Only add separator if current item exists AND it's not the last column
-      if (i < crossAxisCount - 1 && hasItem) {
+      // Preserve spacing between every column slot in whitespace mode so
+      // incomplete builder rows keep the same item width as full rows.
+      if (i < crossAxisCount - 1 && (hasItem || isWhiteSpaceDivider)) {
         children.add(
           AnimateItemWrapper(
             index: animationIndex,

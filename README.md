@@ -29,7 +29,7 @@ Use it for Flutter responsive lists, Flutter responsive grids, list-to-grid layo
 
 ```yaml
 dependencies:
-  responsive_flex_list: ^1.3.0
+  responsive_flex_list: ^1.4.0
 ```
 
 ```bash
@@ -62,13 +62,15 @@ Use `responsive_flex_list` when you need:
 - Smart separators that work in both list and grid modes.
 - Built-in item animations without managing `AnimationController`.
 - Masonry layouts for galleries, feeds, dashboards, listings, or portfolio grids.
-- RTL-aware behavior for Arabic, Persian, Urduor other right-to-left interfaces.
+- RTL-aware behavior for Arabic, Persian, Urdu, or other right-to-left interfaces.
 
 ## When Not To Use It
 
 You may not need this package if you only need a fixed `ListView`, a basic fixed-column `GridView`, or a layout that never changes across screen sizes.
 
 Use caution with very large dynamic-height masonry collections. Pinterest masonry intentionally prebuilds and measures children to keep item positions stable, so it is not a lazy masonry layout.
+
+Avoid `useIntrinsicHeight` for large grids unless matching row heights is more important than layout cost.
 
 ## Why Not Just Use GridView?
 
@@ -136,7 +138,7 @@ ResponsiveFlexList.withSeparators(
 )
 ```
 
-In list mode, only row separators are shown. In grid mode, row and column separators can both be used.
+In list mode, only row separators are shown. In grid mode, row and column separators can both be used. `crossAxisSeparator` is optional; provide it only when you need vertical dividers between columns.
 
 ## Breakpoints
 
@@ -246,6 +248,42 @@ Tradeoff: higher initial work and memory use. Recommended for small to medium co
 | `ResponsiveConfig.init(...)` | Global breakpoint configuration |
 
 Legacy direct layout parameters such as `crossAxisCount`, `minCrossAxisCount`, `maxCrossAxisCount`, `mainAxisSpacing`, and `crossAxisSpacing` are still supported for compatibility, but new code should prefer `gridDelegate`.
+
+Masonry constructors also accept `gridDelegate` for column count, min/max column count, and spacing. `childAspectRatio` and `mainAxisExtent` do not apply to masonry layouts because masonry item height is driven by the child content or row pattern.
+
+## Performance Notes
+
+Standard list, children, and separator layouts are sliver-based and suitable for large lists when item widgets are lightweight.
+
+Pinterest masonry is intentionally non-lazy. It builds and measures all children so item positions stay stable during scrolling and scrollbar dragging. This is best for bounded galleries and feeds, not unbounded infinite scrolling. For heavy item widgets, keep the collection small, disable expensive animations, and consider `cacheChildren: false` when items must rebuild from changing external state.
+
+`useIntrinsicHeight` can be expensive because Flutter must do extra measurement work. Prefer fixed heights, `mainAxisExtent`, or natural child sizing for large lists.
+
+`shrinkWrap: true` is useful inside another scrollable, but it increases layout work. Use it only when the parent layout requires it.
+
+## Common Mistakes
+
+- Using Pinterest masonry for thousands of dynamic-height items. Use it for bounded collections.
+- Enabling `useIntrinsicHeight` on large grids. Prefer fixed or natural item heights.
+- Passing both legacy spacing/count parameters and `gridDelegate`. The delegate wins; prefer one style.
+- Expecting `crossAxisSeparator` to appear in one-column list mode. It only matters when there are multiple columns.
+- Treating breakpoint helpers as device detection. Helpers such as `context.isDesktop` are width-range checks.
+
+## Migration From 1.3.x
+
+- Replace `cacheExtent` with `scrollCacheExtent`.
+- Default desktop breakpoints now use lower-bound semantics: desktop starts at `1024px`, large desktop at `1440px`, and extra-large desktop at `1920px`.
+- Prefer `ResponsiveFlexGridDelegate` over direct layout parameters such as `crossAxisCount`, `mainAxisSpacing`, and `crossAxisSpacing`.
+- `ResponsiveFlexList.withSeparators` no longer requires `crossAxisSeparator`; existing code that passes one continues to work.
+
+## Comparison
+
+| Tool | Best for | Tradeoff |
+| --- | --- | --- |
+| `ListView` | Fixed one-column scrolling lists | No responsive column changes |
+| `GridView` / `SliverGrid` | Known fixed or adaptive grids | You write breakpoint logic yourself |
+| `LayoutBuilder` | Fully custom responsive behavior | More repeated code per screen |
+| `responsive_flex_list` | List-to-grid, separators, simple breakpoints, bounded masonry | Less control than custom slivers |
 
 ## FAQ
 

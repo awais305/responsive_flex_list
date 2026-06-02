@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/builder_example.dart';
 import 'screens/children_example.dart';
+import 'screens/custom_breakpoints_example.dart';
 import 'screens/separator_example.dart';
 
 void main() {
@@ -93,6 +94,17 @@ class ResponsiveFlexListDemo extends StatelessWidget {
                 );
               },
               child: Text('Masonry Example'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CustomBreakpointsExample(),
+                  ),
+                );
+              },
+              child: Text('Custom Breakpoints Example'),
             ),
           ],
         ),
