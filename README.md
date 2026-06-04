@@ -29,7 +29,7 @@ Use it for Flutter responsive lists, Flutter responsive grids, list-to-grid layo
 
 ```yaml
 dependencies:
-  responsive_flex_list: ^1.4.0
+  responsive_flex_list: <latest-version>
 ```
 
 ```bash
@@ -213,8 +213,6 @@ ResponsiveFlexMasonry.instagram(
 )
 ```
 
-<img height=600 alt="Responsive Instagram-style Flutter masonry grid layout" src="assets/instagram.png" />
-
 ### Pinterest Style
 
 Pinterest-style masonry supports variable item heights and enforces a minimum of 2 columns.
@@ -225,8 +223,10 @@ ResponsiveFlexMasonry.pinterest(
   itemBuilder: (context, index) => ProductCard(products[index]),
 )
 ```
+| Instagram Style | Responsive Pinterest Screen |
+| :-------------------------------: | :--------------------------------: |
+| ![Responsive Instagram Screen](assets/instagram.png) | ![Responsive Pinterest Screen](assets/pinterest.png) |
 
-<img height=600 alt="Responsive Pinterest-style Flutter masonry layout with dynamic item heights" src="assets/pinterest.png" />
 
 Pinterest masonry is intentionally non-lazy: it prebuilds and measures children so item positions remain stable while scrolling and while dragging the scrollbar thumb. This avoids visible reflow or jumping that can happen in some lazy staggered layouts.
 
@@ -267,7 +267,7 @@ Pinterest masonry is intentionally non-lazy. It builds and measures all children
 - Enabling `useIntrinsicHeight` on large grids. Prefer fixed or natural item heights.
 - Passing both legacy spacing/count parameters and `gridDelegate`. The delegate wins; prefer one style.
 - Expecting `crossAxisSeparator` to appear in one-column list mode. It only matters when there are multiple columns.
-- Treating breakpoint helpers as device detection. Helpers such as `context.isDesktop` are width-range checks.
+- Treating breakpoint helpers as device detection. Helpers such as `context.isDesktopRange` are width-range checks.
 
 ## Migration From 1.3.x
 

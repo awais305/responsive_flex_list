@@ -1,3 +1,7 @@
+## [1.4.1] - 05 Jun 2026
+
+- Fixed incomplete last-row alignment in `ResponsiveFlexList.builder` by preserving cross-axis spacing for empty column slots.
+
 ## [1.4.0] - 02 Jun 2026
 
 #### Migration Notes
@@ -22,9 +26,6 @@ ___
 - Fixed child caching when `cacheChildren` changes after the first build.
 - Prevented unnecessary cache rebuilds caused by inline `itemBuilder` closures.
 - Fixed cache updates when item counts increase or decrease.
-
-##### Builder Layout
-- Fixed incomplete last-row alignment in `ResponsiveFlexList.builder` by preserving cross-axis spacing for empty column slots.
 
 ##### Scroll Cache
 - Fixed `scrollCacheExtent` forwarding across standard, separator, masonry, and round-robin layouts.
