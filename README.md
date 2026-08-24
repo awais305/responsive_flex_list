@@ -76,15 +76,15 @@ Avoid `useIntrinsicHeight` for large grids unless matching row heights is more i
 
 Flutter's `GridView` is great when you already know the exact grid structure. `responsive_flex_list` is useful when one screen needs to adapt across widths with one API.
 
-| Need | Flutter default approach | With ResponsiveFlexList |
-| --- | --- | --- |
-| List on small screens, grid on larger screens | Manual `LayoutBuilder` logic | Built in |
-| Fixed grid | `GridView` | Supported |
-| Masonry / Pinterest-style layout | Custom layout/package | Built in |
-| Animated item appearance | Manual animation setup | Built in |
-| Separators in list and grid | Manual layout handling | Built in |
-| Custom breakpoints | Manual width checks | Built in |
-| RTL-aware animations | Manual direction checks | Built in |
+| Need                                          | Flutter default approach     | With ResponsiveFlexList |
+| --------------------------------------------- | ---------------------------- | ----------------------- |
+| List on small screens, grid on larger screens | Manual `LayoutBuilder` logic | Built in                |
+| Fixed grid                                    | `GridView`                   | Supported               |
+| Masonry / Pinterest-style layout              | Custom layout/package        | Built in                |
+| Animated item appearance                      | Manual animation setup       | Built in                |
+| Separators in list and grid                   | Manual layout handling       | Built in                |
+| Custom breakpoints                            | Manual width checks          | Built in                |
+| RTL-aware animations                          | Manual direction checks      | Built in                |
 
 ## Basic Usage
 
@@ -144,16 +144,16 @@ In list mode, only row separators are shown. In grid mode, row and column separa
 
 Default breakpoints use lower-bound semantics. For example, `desktop: 1024` applies from `1024px` up to, but not including, the next defined breakpoint.
 
-| Screen Size | Width Range | Default Columns |
-| --- | --- | --- |
-| Small Mobile | < 480px | 1 |
-| Mobile | >= 480px and < 640px | 2 |
-| Small Tablet | >= 640px and < 768px | 3 |
-| Tablet | >= 768px and < 820px | 4 |
-| Laptop | >= 820px and < 1024px | 5 |
-| Desktop | >= 1024px and < 1440px | 6 |
-| Large Desktop | >= 1440px and < 1920px | 7 |
-| Extra Large Desktop | >= 1920px | 8 |
+| Screen Size         | Width Range            | Default Columns |
+| ------------------- | ---------------------- | --------------- |
+| Small Mobile        | < 480px                | 1               |
+| Mobile              | >= 480px and < 640px   | 2               |
+| Small Tablet        | >= 640px and < 768px   | 3               |
+| Tablet              | >= 768px and < 820px   | 4               |
+| Laptop              | >= 820px and < 1024px  | 5               |
+| Desktop             | >= 1024px and < 1440px | 6               |
+| Large Desktop       | >= 1440px and < 1920px | 7               |
+| Extra Large Desktop | >= 1920px              | 8               |
 
 Per-widget override:
 
@@ -223,10 +223,10 @@ ResponsiveFlexMasonry.pinterest(
   itemBuilder: (context, index) => ProductCard(products[index]),
 )
 ```
-| Instagram Style | Responsive Pinterest Screen |
-| :-------------------------------: | :--------------------------------: |
-| ![Responsive Instagram Screen](assets/instagram.png) | ![Responsive Pinterest Screen](assets/pinterest.png) |
 
+|             Responsive Instagram Screen              |             Responsive Pinterest Screen              |
+| :--------------------------------------------------: | :--------------------------------------------------: |
+| ![Responsive Instagram Screen](assets/instagram.png) | ![Responsive Pinterest Screen](assets/pinterest.png) |
 
 Pinterest masonry is intentionally non-lazy: it prebuilds and measures children so item positions remain stable while scrolling and while dragging the scrollbar thumb. This avoids visible reflow or jumping that can happen in some lazy staggered layouts.
 
@@ -234,18 +234,68 @@ Tradeoff: higher initial work and memory use. Recommended for small to medium co
 
 `cacheChildren` defaults to `true`, which preserves built item widgets across parent rebuilds. Set it to `false` only when your Pinterest item widgets must rebuild on every parent rebuild.
 
+## Smart Separators
+
+Add separators that work intelligently across list and grid modes:
+
+```dart
+ResponsiveFlexList.withSeparators(
+  itemCount: listItems.length,
+  itemBuilder: (context, index) {
+    final item = listItems[index];
+    return ListTile(title: Text(item));
+  },
+
+  // Horizontal dividers between rows
+  mainAxisSeparator: (rowIndex, totalRows) => Divider(color: Colors.grey),
+
+  // Vertical dividers between columns
+  crossAxisSeparator: (columnIndex, totalColumns) => Container(
+    width: 1,
+    color: Colors.grey[300],
+  ),
+
+  // Control divider width behavior
+  mainAxisSeparatorMode: MainAxisSeparatorMode.fullWidth, // or itemWidth
+
+  // Required when displaying vertical dividers
+  useIntrinsicHeight: true,
+)
+```
+
+### Separator Behavior
+
+#### Display Modes
+
+- **List mode (1 column):** Only `mainAxisSeparator` appears between rows (similar to `ListView.separated`)
+- **Grid mode (2+ columns):** Both `mainAxisSeparator` (horizontal) and `crossAxisSeparator` (vertical) appear between items.
+
+#### Separator Width Options
+
+- **fullWidth:** Separators span the entire container width (similar to `ListView.separated`)
+- **itemWidth:** Separators only appear between individual items.
+
+#### Layout Algorithm
+
+- **roundRobinLayout:** Distributes items sequentially across columns in rotation (1→2→3→1→2→3...)
+
+|                      Item Width Mode                      |              Round Robin Layout               |
+| :-------------------------------------------------------: | :-------------------------------------------: |
+| ![Item width separators](assets/item_width_separator.png) | ![Round robin layout](assets/round_robin.png) |
+|              _Separators only between items_              |        _Similar to Newspaper' columns_        |
+
 ## API Snapshot
 
-| API | Use |
-| --- | --- |
-| `ResponsiveFlexList(...)` | Responsive layout from a list of children |
-| `ResponsiveFlexList.builder(...)` | Responsive layout for dynamic data |
-| `ResponsiveFlexList.withSeparators(...)` | List/grid layout with row and column separators |
-| `ResponsiveFlexMasonry.instagram(...)` | Instagram-style masonry rows |
-| `ResponsiveFlexMasonry.pinterest(...)` | Pinterest-style variable-height masonry |
-| `ResponsiveFlexGridDelegate` | Fixed columns, min/max columns, spacing, item sizing |
-| `Breakpoints` | Width thresholds and column counts |
-| `ResponsiveConfig.init(...)` | Global breakpoint configuration |
+| API                                      | Use                                                  |
+| ---------------------------------------- | ---------------------------------------------------- |
+| `ResponsiveFlexList(...)`                | Responsive layout from a list of children            |
+| `ResponsiveFlexList.builder(...)`        | Responsive layout for dynamic data                   |
+| `ResponsiveFlexList.withSeparators(...)` | List/grid layout with row and column separators      |
+| `ResponsiveFlexMasonry.instagram(...)`   | Instagram-style masonry rows                         |
+| `ResponsiveFlexMasonry.pinterest(...)`   | Pinterest-style variable-height masonry              |
+| `ResponsiveFlexGridDelegate`             | Fixed columns, min/max columns, spacing, item sizing |
+| `Breakpoints`                            | Width thresholds and column counts                   |
+| `ResponsiveConfig.init(...)`             | Global breakpoint configuration                      |
 
 Legacy direct layout parameters such as `crossAxisCount`, `minCrossAxisCount`, `maxCrossAxisCount`, `mainAxisSpacing`, and `crossAxisSpacing` are still supported for compatibility, but new code should prefer `gridDelegate`.
 
@@ -278,12 +328,12 @@ Pinterest masonry is intentionally non-lazy. It builds and measures all children
 
 ## Comparison
 
-| Tool | Best for | Tradeoff |
-| --- | --- | --- |
-| `ListView` | Fixed one-column scrolling lists | No responsive column changes |
-| `GridView` / `SliverGrid` | Known fixed or adaptive grids | You write breakpoint logic yourself |
-| `LayoutBuilder` | Fully custom responsive behavior | More repeated code per screen |
-| `responsive_flex_list` | List-to-grid, separators, simple breakpoints, bounded masonry | Less control than custom slivers |
+| Tool                      | Best for                                                      | Tradeoff                            |
+| ------------------------- | ------------------------------------------------------------- | ----------------------------------- |
+| `ListView`                | Fixed one-column scrolling lists                              | No responsive column changes        |
+| `GridView` / `SliverGrid` | Known fixed or adaptive grids                                 | You write breakpoint logic yourself |
+| `LayoutBuilder`           | Fully custom responsive behavior                              | More repeated code per screen       |
+| `responsive_flex_list`    | List-to-grid, separators, simple breakpoints, bounded masonry | Less control than custom slivers    |
 
 ## FAQ
 

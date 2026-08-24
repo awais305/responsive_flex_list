@@ -192,6 +192,35 @@ class SliverInstagramGrid extends StatelessWidget {
     return rowCount;
   }
 
+  /// Calculates starting item index for a given row index without looping
+  /// through all previous rows.
+  static int _calculateStartItemIndex(
+    int rowIndex,
+    List<List<int>> patterns,
+  ) {
+    if (rowIndex <= 0 || patterns.isEmpty) return 0;
+
+    final int cycleLength = patterns.length;
+    int itemsPerCycle = 0;
+    for (int i = 0; i < cycleLength; i++) {
+      for (final itemsInCol in patterns[i]) {
+        itemsPerCycle += itemsInCol;
+      }
+    }
+
+    final int fullCycles = rowIndex ~/ cycleLength;
+    final int remainderRows = rowIndex % cycleLength;
+
+    int remainderItems = 0;
+    for (int i = 0; i < remainderRows; i++) {
+      for (final itemsInCol in patterns[i]) {
+        remainderItems += itemsInCol;
+      }
+    }
+
+    return fullCycles * itemsPerCycle + remainderItems;
+  }
+
   /// Build a single row of the grid following the pattern for this row index.
   Widget _buildRow(
     BuildContext context,
@@ -211,16 +240,8 @@ class SliverInstagramGrid extends StatelessWidget {
         // Calculate row height based on column width and multiplier
         final rowHeight = columnWidth * (maxRowHeightMultiplier * 2);
 
-        // Calculate which item index this row starts at
-        // by summing items from all previous rows
-        int startItemIndex = 0;
-        for (int r = 0; r < rowIndex; r++) {
-          final rowPattern = patterns[r % patterns.length];
-          startItemIndex += rowPattern.fold(
-            0,
-            (sum, itemsInCol) => sum + itemsInCol,
-          );
-        }
+        // Calculate which item index this row starts at in O(1) time
+        final int startItemIndex = _calculateStartItemIndex(rowIndex, patterns);
 
         final List<Widget> rowChildren = [];
         int currentItemIndex = startItemIndex;

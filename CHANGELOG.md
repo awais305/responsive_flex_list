@@ -1,3 +1,11 @@
+## [1.4.2] - 24 Aug 2026
+
+#### Performance
+- Improved grid and list rendering performance.
+- Optimized Instagram-style grid row calculations.
+- Reduced unnecessary widget processing when building rows.
+- Reduced animation overhead by using a single animation controller for staggered animations.
+
 ## [1.4.1] - 05 Jun 2026
 
 - Fixed incomplete last-row alignment in `ResponsiveFlexList.builder` by preserving cross-axis spacing for empty column slots.

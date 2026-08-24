@@ -113,8 +113,8 @@ class ListAnimations extends StatefulWidget {
 class ListAnimationsState extends State<ListAnimations>
     with TickerProviderStateMixin {
   final GlobalKey _listKey = GlobalKey();
-  late List<Animation<double>> _animations;
-  late List<AnimationController> _controllers;
+  List<Animation<double>> _animations = [];
+  AnimationController? _controller;
   bool _hasAnimated = false;
 
   /// Expose animations for subclasses to use in custom layouts
@@ -160,7 +160,7 @@ class ListAnimationsState extends State<ListAnimations>
   }
 
   void _initializeEmptyAnimations() {
-    _controllers = [];
+    _disposeControllers();
     _animations = [];
   }
 
@@ -188,53 +188,62 @@ class ListAnimationsState extends State<ListAnimations>
     final int currentItemCount = _getCurrentItemCount();
     final int maxItems = currentItemCount.clamp(0, widget.maxStaggeredItems);
 
-    _controllers = List.generate(
-      maxItems,
-      (index) =>
-          AnimationController(duration: widget.animationDuration, vsync: this),
+    if (maxItems == 0) {
+      _animations = [];
+      return;
+    }
+
+    final int staggerMs = widget.staggerDelay.inMilliseconds;
+    final int animMs = widget.animationDuration.inMilliseconds;
+    final int totalMs = (maxItems - 1) * staggerMs + animMs;
+
+    if (totalMs <= 0 || animMs <= 0) {
+      _animations = List.generate(
+        maxItems,
+        (_) => const AlwaysStoppedAnimation<double>(1.0),
+      );
+      return;
+    }
+
+    _controller = AnimationController(
+      duration: Duration(milliseconds: totalMs),
+      vsync: this,
     );
 
-    _animations = _controllers
-        .map(
-          (controller) =>
-              CurvedAnimation(parent: controller, curve: widget.animationCurve),
-        )
-        .toList();
+    _animations = List.generate(maxItems, (i) {
+      final double begin = (i * staggerMs / totalMs).clamp(0.0, 1.0);
+      final double rawEnd =
+          ((i * staggerMs + animMs) / totalMs).clamp(0.0, 1.0);
+      final double end =
+          rawEnd <= begin ? (begin + 0.0001).clamp(0.0, 1.0) : rawEnd;
+
+      return CurvedAnimation(
+        parent: _controller!,
+        curve: Interval(
+          begin,
+          end,
+          curve: widget.animationCurve,
+        ),
+      );
+    });
   }
 
   void _startAnimation() {
-    if (_controllers.isEmpty) return;
+    if (_controller == null || _animations.isEmpty) return;
 
-    for (final controller in _controllers) {
-      controller.reset();
-    }
-
-    for (int i = 0; i < _controllers.length; i++) {
-      Future.delayed(
-        Duration(milliseconds: widget.staggerDelay.inMilliseconds * i),
-        () {
-          if (mounted && i < _controllers.length) {
-            _controllers[i].forward();
-          }
-        },
-      );
-    }
+    _controller!.reset();
+    _controller!.forward();
   }
 
   void _skipAnimation() {
-    if (_controllers.isEmpty) return;
-
-    for (final controller in _controllers) {
-      controller.value = 1.0;
-    }
+    if (_controller == null) return;
+    _controller!.value = 1.0;
   }
 
   void _disposeControllers() {
-    for (final controller in _controllers) {
-      controller.dispose();
-    }
-    _controllers.clear();
-    _animations.clear();
+    _controller?.dispose();
+    _controller = null;
+    _animations = [];
   }
 
   @override

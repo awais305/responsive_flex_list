@@ -1465,4 +1465,155 @@ void main() {
       expect(find.text('Item'), findsOneWidget);
     });
   });
+
+  group('ListAnimations optimization verification', () {
+    testWidgets('animates with zero stagger delay', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationDuration: Duration(milliseconds: 300),
+            staggerDelay: Duration.zero,
+            animationType: AnimationType.fade,
+            children: [Text('Item 1'), Text('Item 2')],
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(find.text('Item 1'), findsOneWidget);
+      expect(find.text('Item 2'), findsOneWidget);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('animates with small and large stagger delay', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationDuration: Duration(milliseconds: 200),
+            staggerDelay: Duration(milliseconds: 50),
+            animationType: AnimationType.fade,
+            children: [Text('Item 1'), Text('Item 2')],
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pumpAndSettle();
+      expect(find.text('Item 1'), findsOneWidget);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationDuration: Duration(milliseconds: 200),
+            staggerDelay: Duration(milliseconds: 500),
+            animationType: AnimationType.fade,
+            children: [Text('Item 1'), Text('Item 2')],
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pumpAndSettle();
+      expect(find.text('Item 1'), findsOneWidget);
+    });
+
+    testWidgets('animates single item and max items limit', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationDuration: Duration(milliseconds: 300),
+            staggerDelay: Duration(milliseconds: 100),
+            animationType: AnimationType.fade,
+            maxStaggeredItems: 2,
+            children: [Text('Item 1'), Text('Item 2'), Text('Item 3')],
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pumpAndSettle();
+      expect(find.text('Item 1'), findsOneWidget);
+      expect(find.text('Item 3'), findsOneWidget);
+    });
+
+    testWidgets('handles disposal during active animation without leaks',
+        (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationDuration: Duration(milliseconds: 500),
+            staggerDelay: Duration(milliseconds: 100),
+            animationType: AnimationType.fade,
+            children: [Text('Item 1'), Text('Item 2')],
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      // Dispose by pumping different widget mid-animation
+      await tester.pumpWidget(const MaterialApp(home: Text('Disposed')));
+      expect(find.text('Disposed'), findsOneWidget);
+    });
+
+    testWidgets('handles widget rebuilds during animation', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationDuration: Duration(milliseconds: 400),
+            staggerDelay: Duration(milliseconds: 100),
+            animationType: AnimationType.fade,
+            children: [Text('Item 1'), Text('Item 2')],
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Rebuild with updated parameter
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationDuration: Duration(milliseconds: 400),
+            staggerDelay: Duration(milliseconds: 100),
+            animationType: AnimationType.fade,
+            children: [Text('Item 1'), Text('Item 2')],
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('Item 1'), findsOneWidget);
+    });
+
+    testWidgets(
+        'does not throw LateInitializationError for AnimationType.none or empty list',
+        (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            animationType: AnimationType.none,
+            children: [Text('Item 1')],
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('Item 1'), findsOneWidget);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ResponsiveFlexList(
+            children: [],
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('No items to display'), findsOneWidget);
+    });
+  });
 }

@@ -561,6 +561,23 @@ void main() {
       expect(find.byType(ResponsiveFlexMasonry), findsOneWidget);
       await tester.pumpAndSettle();
     });
+
+    testWidgets('renders large item count in instagram layout with correct item indices', (tester) async {
+      final items = List.generate(50, (i) => i);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.instagram(
+            crossAxisCount: 3,
+            itemCount: items.length,
+            itemBuilder: (context, index) => Text('Instagram Item $index'),
+          ),
+        ),
+      );
+
+      expect(find.text('Instagram Item 0'), findsOneWidget);
+      expect(find.text('Instagram Item 1'), findsOneWidget);
+      expect(find.text('Instagram Item 2'), findsOneWidget);
+    });
   });
 }
 

@@ -88,23 +88,21 @@ class ChildrenLayout extends BaseResponsiveLayout {
         (startIndex + crossAxisCount).clamp(0, children.length);
 
     // Extract and animate children for this row
-    List<Widget> rowItems = children
-        .asMap()
-        .entries
-        .map((entry) {
-          final animationIndex = calculateAnimationIndex(
-            itemIndex: entry.key,
-            rowIndex: rowIndex,
-            columnIndex: entry.key % crossAxisCount,
-          );
+    List<Widget> rowItems = [];
+    for (int i = startIndex; i < endIndex; i++) {
+      final animationIndex = calculateAnimationIndex(
+        itemIndex: i,
+        rowIndex: rowIndex,
+        columnIndex: i % crossAxisCount,
+      );
 
-          return buildAnimatedItem(
-            animationIndex: animationIndex,
-            child: entry.value,
-          );
-        })
-        .toList()
-        .sublist(startIndex, endIndex);
+      rowItems.add(
+        buildAnimatedItem(
+          animationIndex: animationIndex,
+          child: children[i],
+        ),
+      );
+    }
 
     // Reverse order for RTL layouts
     rowItems = applyRTLReversal(rowItems);

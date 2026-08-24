@@ -1,7 +1,7 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  exclude: [".github/**", "build/**"]
+  exclude: [".github/**", "build/**", android/**, ios/**, web/**, windows/**, macos/**, linux/**]
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false
