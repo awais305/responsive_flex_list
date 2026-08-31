@@ -41,6 +41,10 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
 
   // RTL and accessibility
   final bool isRTL;
+
+  /// Whether all children in each row should match the height of the tallest child.
+  ///
+  /// [mainAxisExtent] or [childAspectRatio] takes priority when provided.
   final bool useIntrinsicHeight;
   final RTLOptions rtlOptions;
   final double? maxRowHeight;
@@ -286,7 +290,9 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
   }) {
     return Padding(
       padding: customPadding ??
-          EdgeInsets.only(bottom: getEffectiveMainAxisSpacing()),
+          EdgeInsets.only(
+            bottom: isLastRow(rowIndex) ? 0 : getEffectiveMainAxisSpacing(),
+          ),
       child: _buildStandardRow(
         rowIndex: rowIndex,
         isWhiteSpaceDivider: isWhiteSpaceDivider,
@@ -298,6 +304,23 @@ abstract class BaseResponsiveLayout extends StatelessWidget {
   @protected
   bool isLastRow(int rowIndex) {
     return rowIndex >= calculateRowCount() - 1;
+  }
+
+  /// Helper method to size a child widget based on mainAxisExtent or childAspectRatio.
+  @protected
+  Widget buildSizedItem({required Widget child}) {
+    if (mainAxisExtent != null) {
+      return SizedBox(
+        height: mainAxisExtent,
+        child: child,
+      );
+    } else if (childAspectRatio != null) {
+      return AspectRatio(
+        aspectRatio: childAspectRatio!,
+        child: child,
+      );
+    }
+    return child;
   }
 
   /// Helper method to build row with conditional separator

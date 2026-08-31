@@ -229,6 +229,9 @@ class SliverInstagramGrid extends StatelessWidget {
   ) {
     return LayoutBuilder(
       builder: (layoutContext, constraints) {
+        final totalRows = _calculateRowCount(patterns);
+        final bool isLastRow = rowIndex == totalRows - 1;
+
         // Determine which pattern to use (cycles through available patterns)
         final pattern = patterns[rowIndex % patterns.length];
 
@@ -310,7 +313,7 @@ class SliverInstagramGrid extends StatelessWidget {
         // Wrap columns in a Row with fixed height and bottom margin
         return Container(
           height: rowHeight,
-          margin: EdgeInsets.only(bottom: mainAxisSpacing),
+          margin: EdgeInsets.only(bottom: isLastRow ? 0 : mainAxisSpacing),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,

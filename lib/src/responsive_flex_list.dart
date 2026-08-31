@@ -1,5 +1,4 @@
-import 'package:responsive_flex_list/src/core/core.dart';
-import 'package:responsive_flex_list/src/models/rtl_options.dart';
+import 'package:responsive_flex_list/responsive_flex_list.dart';
 import 'package:responsive_flex_list/src/widgets/base_responsive_widget.dart';
 
 /// A responsive list view that automatically adjusts the number of columns
@@ -112,7 +111,8 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.minCrossAxisCount,
     @Deprecated('Use gridDelegate.maxCrossAxisCount instead')
     super.maxCrossAxisCount,
-    super.gridDelegate,
+    ResponsiveFlexGridDelegate? gridDelegate,
+    super.useIntrinsicHeight = false,
     @Deprecated('Use gridDelegate.childAspectRatio instead')
     super.childAspectRatio,
     @Deprecated('Use gridDelegate.mainAxisExtent instead') super.mainAxisExtent,
@@ -123,13 +123,13 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
           'animationDuration cannot be used with $animationType',
         ),
         super(
+          gridDelegate: gridDelegate,
           itemCount: 0,
           itemBuilder: null,
           mainAxisSeparator: null,
           crossAxisSeparator: null,
           type: ResponsiveListType.children,
           mainAxisSeparatorMode: kDefaultMainAxisSeparatorMode,
-          useIntrinsicHeight: false,
           maxRowHeightMultiplier: 1,
           maxRowHeight: null,
           roundRobinLayout: false,
@@ -177,6 +177,7 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.maxStaggeredItems,
     super.customAnimationBuilder,
     super.rtlOptions = RTLOptions.defaults,
+    super.useIntrinsicHeight = false,
     @Deprecated('Use gridDelegate.mainAxisSpacing instead')
     super.mainAxisSpacing = kDefaultMainAxisSpacing,
     @Deprecated('Use gridDelegate.crossAxisSpacing instead')
@@ -185,7 +186,7 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.minCrossAxisCount,
     @Deprecated('Use gridDelegate.maxCrossAxisCount instead')
     super.maxCrossAxisCount,
-    super.gridDelegate,
+    ResponsiveFlexGridDelegate? gridDelegate,
   })  : assert(
           animationDuration == null ||
               (animationType != AnimationType.none ||
@@ -193,13 +194,13 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
           'animationDuration cannot be used with $animationType',
         ),
         super(
+          gridDelegate: gridDelegate,
           maxRowHeight: null,
           children: const [],
           mainAxisSeparator: null,
           crossAxisSeparator: null,
           mainAxisSeparatorMode: kDefaultMainAxisSeparatorMode,
           type: ResponsiveListType.builder,
-          useIntrinsicHeight: false,
           maxRowHeightMultiplier: 1,
           roundRobinLayout: false,
         );
@@ -253,10 +254,14 @@ class ResponsiveFlexList extends BaseResponsiveWidget {
     super.minCrossAxisCount,
     @Deprecated('Use gridDelegate.maxCrossAxisCount instead')
     super.maxCrossAxisCount,
-    super.gridDelegate,
-  })  : assert(!roundRobinLayout || gridDelegate?.childAspectRatio == null,
+    ResponsiveFlexGridDelegate? gridDelegate,
+  })  : assert(
+            !roundRobinLayout ||
+                gridDelegate == null ||
+                gridDelegate.childAspectRatio == null,
             'You can only pass one of `roundRobinLayout` or `gridDelegate.childAspectRatio`'),
         super(
+          gridDelegate: gridDelegate,
           children: const [],
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,

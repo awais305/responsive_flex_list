@@ -142,7 +142,9 @@ class RoundRobinLayout extends BaseResponsiveLayout {
       columnChildren.add(
         buildAnimatedItem(
           animationIndex: animationIndex,
-          child: itemBuilder!(context, globalIndex),
+          child: buildSizedItem(
+            child: itemBuilder!(context, globalIndex),
+          ),
         ),
       );
 

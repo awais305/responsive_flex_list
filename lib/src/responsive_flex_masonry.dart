@@ -62,7 +62,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.crossAxisSpacing = 1,
     super.minCrossAxisCount,
     super.maxCrossAxisCount,
-    super.gridDelegate,
+    ResponsiveMasonryGridDelegate? gridDelegate,
   })  : assert(
           animationDuration == null ||
               (animationType != AnimationType.none ||
@@ -71,6 +71,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
         ),
         super(
           children: const [],
+          gridDelegate: gridDelegate,
           roundRobinLayout: false,
           mainAxisSeparatorMode: kDefaultMainAxisSeparatorMode,
           mainAxisSeparator: null,
@@ -113,7 +114,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
     super.cacheChildren,
     super.minCrossAxisCount,
     super.maxCrossAxisCount,
-    super.gridDelegate,
+    ResponsiveMasonryGridDelegate? gridDelegate,
   })  : assert(
           animationDuration == null ||
               (animationType != AnimationType.none ||
@@ -122,6 +123,7 @@ class ResponsiveFlexMasonry extends BaseResponsiveWidget {
         ),
         super(
           children: const [],
+          gridDelegate: gridDelegate,
           roundRobinLayout: false,
           mainAxisSeparatorMode: kDefaultMainAxisSeparatorMode,
           mainAxisSeparator: null,

@@ -22,38 +22,78 @@ class Breakpoints {
     extraLargeDesktopColumns: 8,
   );
 
-  /// Small mobile devices. This is the fallback size below [mobile].
+  /// Small mobile devices. Used as the fallback when the width is below
+  /// the [mobile] breakpoint.
+  ///
+  /// Targets widths below `[mobile]`.
   final double? smallMobile;
 
-  /// Standard mobile devices (e.g., iPhone 12, Pixel), starting at this width.
+  /// Standard mobile devices.
+  ///
+  /// Targets widths of `[480px]` and above, until the next breakpoint.
   final double? mobile;
 
-  /// Small tablets (e.g., iPad Mini), starting at this width.
+  /// Small tablets.
+  ///
+  /// Targets widths of `[640px]` and above, until the next breakpoint.
   final double? smallTablet;
 
-  /// Full tablets (e.g., iPad), starting at this width.
+  /// Full tablets.
+  ///
+  /// Targets widths of `[768px]` and above, until the next breakpoint.
   final double? tablet;
 
-  /// Small laptops (e.g., MacBook Air 11"), starting at this width.
+  /// Small laptops.
+  ///
+  /// Targets widths of `[820px]` and above, until the next breakpoint.
   final double? laptop;
 
-  /// Desktops (e.g., 13"-15" screens), starting at this width.
+  /// Desktops.
+  ///
+  /// Targets widths of `[1024px]` and above, until the next breakpoint.
   final double? desktop;
 
-  /// Large desktops (e.g., ultrawide monitors), starting at this width.
+  /// Large desktops.
+  ///
+  /// Targets widths of `[1440px]` and above, until the next breakpoint.
   final double? largeDesktop;
 
-  /// Extra large desktops (e.g., 4K setups), starting at this width.
+  /// Extra large desktops.
+  ///
+  /// Targets widths of `[1920px]` and above.
   final double? extraLargeDesktop;
 
   /// Number of columns for each breakpoint.
+  ///
+  /// Default value is `1`
   final int smallMobileColumns;
+
+  ///
+  /// Default value is `2`
   final int mobileColumns;
+
+  ///
+  /// Default value is `3`
   final int smallTabletColumns;
+
+  ///
+  /// Default value is `4`
   final int tabletColumns;
+
+  ///
+  /// Default value is `5`
   final int laptopColumns;
+
+  ///
+  /// Default value is `6`
   final int desktopColumns;
+
+  ///
+  /// Default value is `7`
   final int largeDesktopColumns;
+
+  ///
+  /// Default value is `8`
   final int extraLargeDesktopColumns;
 
   /// Creates a new [Breakpoints] configuration.

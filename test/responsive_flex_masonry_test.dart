@@ -562,7 +562,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('renders large item count in instagram layout with correct item indices', (tester) async {
+    testWidgets(
+        'renders large item count in instagram layout with correct item indices',
+        (tester) async {
       final items = List.generate(50, (i) => i);
       await tester.pumpWidget(
         MaterialApp(
@@ -577,6 +579,298 @@ void main() {
       expect(find.text('Instagram Item 0'), findsOneWidget);
       expect(find.text('Instagram Item 1'), findsOneWidget);
       expect(find.text('Instagram Item 2'), findsOneWidget);
+    });
+  });
+
+  group('ResponsiveMasonryGridDelegate tests', () {
+    test('ResponsiveMasonryGridDelegate construction and properties', () {
+      const delegate = ResponsiveMasonryGridDelegate(
+        crossAxisSpacing: 12.0,
+        mainAxisSpacing: 16.0,
+        crossAxisCount: 3,
+        minCrossAxisCount: 2,
+        maxCrossAxisCount: 5,
+      );
+
+      expect(delegate.crossAxisSpacing, equals(12.0));
+      expect(delegate.mainAxisSpacing, equals(16.0));
+      expect(delegate.crossAxisCount, equals(3));
+      expect(delegate.minCrossAxisCount, equals(2));
+      expect(delegate.maxCrossAxisCount, equals(5));
+    });
+
+    test('Grid delegate inheritance hierarchy and cross-type inequality', () {
+      const flexDelegate = ResponsiveFlexGridDelegate(
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 3,
+      );
+      const masonryDelegate = ResponsiveMasonryGridDelegate(
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 3,
+      );
+
+      expect(flexDelegate, isA<ResponsiveGridDelegate>());
+      expect(masonryDelegate, isA<ResponsiveGridDelegate>());
+      expect(flexDelegate, isNot(equals(masonryDelegate)));
+    });
+
+    test('ResponsiveMasonryGridDelegate equality and hashCode', () {
+      const delegate1 = ResponsiveMasonryGridDelegate(
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 3,
+      );
+      const delegate2 = ResponsiveMasonryGridDelegate(
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 3,
+      );
+      const delegate3 = ResponsiveMasonryGridDelegate(
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 10,
+        crossAxisCount: 3,
+      );
+
+      expect(delegate1, equals(delegate2));
+      expect(delegate1.hashCode, equals(delegate2.hashCode));
+      expect(delegate1, isNot(equals(delegate3)));
+    });
+
+    test('ResponsiveMasonryGridDelegate assertion validations', () {
+      expect(
+        () => ResponsiveMasonryGridDelegate(crossAxisSpacing: -1),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveMasonryGridDelegate(mainAxisSpacing: -1),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveMasonryGridDelegate(crossAxisCount: 0),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveMasonryGridDelegate(minCrossAxisCount: 0),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveMasonryGridDelegate(maxCrossAxisCount: 0),
+        throwsAssertionError,
+      );
+      expect(
+        () => ResponsiveMasonryGridDelegate(
+          minCrossAxisCount: 4,
+          maxCrossAxisCount: 2,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    testWidgets(
+        'ResponsiveFlexMasonry.instagram accepts ResponsiveMasonryGridDelegate',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.instagram(
+            itemCount: 4,
+            gridDelegate: const ResponsiveMasonryGridDelegate(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) => SizedBox(
+              height: 100,
+              child: Text('Item $index'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('Item 0'), findsOneWidget);
+      expect(find.text('Item 1'), findsOneWidget);
+    });
+
+    testWidgets(
+        'ResponsiveFlexMasonry.pinterest accepts ResponsiveMasonryGridDelegate',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 4,
+            gridDelegate: const ResponsiveMasonryGridDelegate(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 12,
+            ),
+            itemBuilder: (context, index) => SizedBox(
+              height: 80 + index * 20,
+              child: Text('Masonry Item $index'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('Masonry Item 0'), findsOneWidget);
+      expect(find.text('Masonry Item 3'), findsOneWidget);
+    });
+
+    testWidgets(
+        'Fallback spacing and column calculations remain unchanged when gridDelegate is null',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 2,
+            crossAxisCount: 2,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 25,
+            itemBuilder: (context, index) => Text('Fallback $index'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('Fallback 0'), findsOneWidget);
+      expect(find.text('Fallback 1'), findsOneWidget);
+    });
+
+    testWidgets(
+        'ResponsiveMasonryGridDelegate crossAxisCount enforces exact column count',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 6,
+            gridDelegate: const ResponsiveMasonryGridDelegate(
+              crossAxisCount: 3,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) => Container(
+              key: ValueKey('item_$index'),
+              height: 100,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstItemWidth =
+          tester.getSize(find.byKey(const ValueKey('item_0'))).width;
+      // Total width 600 - 2 * 10 (spacing) = 580. 580 / 3 = 193.33333333333334
+      expect(firstItemWidth, closeTo(193.33, 0.1));
+    });
+
+    testWidgets(
+        'ResponsiveMasonryGridDelegate minCrossAxisCount clamps minimum column count',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 6,
+            gridDelegate: const ResponsiveMasonryGridDelegate(
+              minCrossAxisCount: 3,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) => Container(
+              key: ValueKey('item_$index'),
+              height: 100,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstItemWidth =
+          tester.getSize(find.byKey(const ValueKey('item_0'))).width;
+      // At 320px screen width, default breakpoint gives 1 column, but minCrossAxisCount = 3 clamps to 3 columns.
+      // Total width 320 - 2 * 10 = 300. 300 / 3 = 100.
+      expect(firstItemWidth, closeTo(100.0, 0.1));
+    });
+
+    testWidgets(
+        'ResponsiveMasonryGridDelegate maxCrossAxisCount clamps maximum column count',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1920, 1080));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 8,
+            gridDelegate: const ResponsiveMasonryGridDelegate(
+              maxCrossAxisCount: 4,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) => Container(
+              key: ValueKey('item_$index'),
+              height: 100,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstItemWidth =
+          tester.getSize(find.byKey(const ValueKey('item_0'))).width;
+      // At 1920px screen width, default breakpoint gives 8 columns, but maxCrossAxisCount = 4 clamps to 4 columns.
+      // Total width 1920 - 3 * 10 = 1890. 1890 / 4 = 472.5.
+      expect(firstItemWidth, closeTo(472.5, 0.1));
+    });
+
+    testWidgets(
+        'ResponsiveMasonryGridDelegate prioritizes gridDelegate properties over legacy direct parameters',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexMasonry.pinterest(
+            itemCount: 4,
+            crossAxisCount: 2, // Legacy direct parameter
+            gridDelegate: const ResponsiveMasonryGridDelegate(
+              crossAxisCount: 4, // Delegate should take priority
+              crossAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) => Container(
+              key: ValueKey('item_$index'),
+              height: 100,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstItemWidth =
+          tester.getSize(find.byKey(const ValueKey('item_0'))).width;
+      // Total width 600 - 3 * 10 = 570. 570 / 4 = 142.5.
+      expect(firstItemWidth, closeTo(142.5, 0.1));
     });
   });
 }

@@ -293,13 +293,12 @@ ResponsiveFlexList.withSeparators(
 | `ResponsiveFlexList.withSeparators(...)` | List/grid layout with row and column separators      |
 | `ResponsiveFlexMasonry.instagram(...)`   | Instagram-style masonry rows                         |
 | `ResponsiveFlexMasonry.pinterest(...)`   | Pinterest-style variable-height masonry              |
-| `ResponsiveFlexGridDelegate`             | Fixed columns, min/max columns, spacing, item sizing |
+| `ResponsiveFlexGridDelegate`             | Grid columns, spacing, childAspectRatio, and mainAxisExtent |
+| `ResponsiveMasonryGridDelegate`          | Masonry layout column counts and spacing configuration |
 | `Breakpoints`                            | Width thresholds and column counts                   |
 | `ResponsiveConfig.init(...)`             | Global breakpoint configuration                      |
 
-Legacy direct layout parameters such as `crossAxisCount`, `minCrossAxisCount`, `maxCrossAxisCount`, `mainAxisSpacing`, and `crossAxisSpacing` are still supported for compatibility, but new code should prefer `gridDelegate`.
-
-Masonry constructors also accept `gridDelegate` for column count, min/max column count, and spacing. `childAspectRatio` and `mainAxisExtent` do not apply to masonry layouts because masonry item height is driven by the child content or row pattern.
+Legacy parameters such as `crossAxisCount`, `mainAxisSpacing`, and `crossAxisSpacing` are supported for compatibility, but new code should prefer `gridDelegate`. Both `ResponsiveFlexGridDelegate` and `ResponsiveMasonryGridDelegate` inherit from abstract `ResponsiveGridDelegate`. Masonry layouts derive item height from content/pattern rules and do not use `childAspectRatio` or `mainAxisExtent`.
 
 ## Performance Notes
 
@@ -355,7 +354,7 @@ No. Pinterest masonry intentionally prebuilds and measures children to keep item
 
 ### Can I force or limit column count?
 
-Yes. Use `ResponsiveFlexGridDelegate(crossAxisCount: ...)`, `minCrossAxisCount`, or `maxCrossAxisCount`.
+Yes. Use `ResponsiveFlexGridDelegate` or `ResponsiveMasonryGridDelegate` (`crossAxisCount`, `minCrossAxisCount`, `maxCrossAxisCount`).
 
 ### Does it support RTL layouts?
 

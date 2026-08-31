@@ -192,7 +192,7 @@ class ListsRowBuilder extends StatelessWidget {
       return useIntrinsicHeight
           ? IntrinsicHeight(
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
                 children: children.reversed.toList(),
               ),
@@ -218,7 +218,7 @@ class ListsRowBuilder extends StatelessWidget {
     return useIntrinsicHeight
         ? IntrinsicHeight(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
               children: children,
             ),
@@ -258,7 +258,7 @@ class ListsRowBuilder extends StatelessWidget {
         // Compensate for horizontal separator spacing to maintain visual balance
         padding: EdgeInsets.only(
           top: rowIndex == 0 ? 0 : mainAxisSpacing,
-          bottom: mainAxisSpacing,
+          bottom: isNotLastRow ? mainAxisSpacing : 0,
         ),
         child: crossAxisSeparator?.call(columnIndex, crossAxisCount) ??
             const Padding(

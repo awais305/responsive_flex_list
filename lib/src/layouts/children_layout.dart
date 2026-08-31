@@ -99,7 +99,7 @@ class ChildrenLayout extends BaseResponsiveLayout {
       rowItems.add(
         buildAnimatedItem(
           animationIndex: animationIndex,
-          child: children[i],
+          child: buildSizedItem(child: children[i]),
         ),
       );
     }
@@ -141,12 +141,23 @@ class ChildrenLayout extends BaseResponsiveLayout {
     }
 
     return Padding(
-      padding: EdgeInsets.only(bottom: getEffectiveMainAxisSpacing()),
-      child: Row(
-        spacing: getEffectiveCrossAxisSpacing() / 2,
-        textDirection: getTextDirection(),
-        children: rowChildren,
+      padding: EdgeInsets.only(
+        bottom: isLastRow(rowIndex) ? 0 : getEffectiveMainAxisSpacing(),
       ),
+      child: useIntrinsicHeight
+          ? IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: getEffectiveCrossAxisSpacing() / 2,
+                textDirection: getTextDirection(),
+                children: rowChildren,
+              ),
+            )
+          : Row(
+              spacing: getEffectiveCrossAxisSpacing() / 2,
+              textDirection: getTextDirection(),
+              children: rowChildren,
+            ),
     );
   }
 }

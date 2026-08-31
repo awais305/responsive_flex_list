@@ -1,3 +1,16 @@
+## [1.5.0] - 1 Sep 2026
+
+#### Breaking Changes
+- Introduced `ResponsiveMasonryGridDelegate` for masonry layouts.
+- `ResponsiveFlexMasonry.instagram` and `ResponsiveFlexMasonry.pinterest` now use `ResponsiveMasonryGridDelegate` instead of `ResponsiveFlexGridDelegate`.
+- `ResponsiveMasonryGridDelegate` contains only masonry-relevant properties and does not support `childAspectRatio` or `mainAxisExtent`.
+- `ResponsiveFlexGridDelegate` remains the delegate for `ResponsiveFlexList` layouts.
+
+#### Fixes
+- Prevented trailing `mainAxisSpacing` from being added after the last row.
+- Fixed unnecessary bottom spacing after the final row in layouts using main-axis spacing.
+
+
 ## [1.4.2] - 24 Aug 2026
 
 #### Performance

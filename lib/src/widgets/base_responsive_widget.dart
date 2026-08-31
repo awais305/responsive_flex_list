@@ -5,7 +5,7 @@ import 'package:responsive_flex_list/src/widgets/list_animations.dart';
 
 /// Base class for all responsive widgets (List and Masonry).
 ///
-class BaseResponsiveWidget extends StatefulWidget {
+abstract class BaseResponsiveWidget extends StatefulWidget {
   const BaseResponsiveWidget({
     super.key,
     required this.children,
@@ -120,7 +120,7 @@ class BaseResponsiveWidget extends StatefulWidget {
   final int? maxCrossAxisCount;
 
   /// A delegate that controls the layout of children within the list/grid.
-  final ResponsiveFlexGridDelegate? gridDelegate;
+  final ResponsiveGridDelegate? gridDelegate;
 
   /// The ratio of the cross-axis to the main-axis extent of each child.
   final double? childAspectRatio;
@@ -375,11 +375,19 @@ class BaseResponsiveWidgetState extends State<BaseResponsiveWidget> {
   }
 
   double? _getChildAspectRatio() {
-    return widget.gridDelegate?.childAspectRatio ?? widget.childAspectRatio;
+    final delegate = widget.gridDelegate;
+    if (delegate is ResponsiveFlexGridDelegate) {
+      return delegate.childAspectRatio ?? widget.childAspectRatio;
+    }
+    return widget.childAspectRatio;
   }
 
   double? _getMainAxisExtent() {
-    return widget.gridDelegate?.mainAxisExtent ?? widget.mainAxisExtent;
+    final delegate = widget.gridDelegate;
+    if (delegate is ResponsiveFlexGridDelegate) {
+      return delegate.mainAxisExtent ?? widget.mainAxisExtent;
+    }
+    return widget.mainAxisExtent;
   }
 
   double? _getMainAxisSpacing() {

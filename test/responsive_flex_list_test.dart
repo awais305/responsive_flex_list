@@ -1415,6 +1415,61 @@ void main() {
           tester.getCenter(find.text('Item 3')).dy, isNot(equals(firstRowY)));
     });
 
+    testWidgets('flex_grid_delegate_respects_min_cross_axis_count',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexList.builder(
+            itemCount: 4,
+            gridDelegate: const ResponsiveFlexGridDelegate(
+              minCrossAxisCount: 3,
+            ),
+            itemBuilder: (context, index) =>
+                SizedBox(height: 80, child: Text('Item $index')),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstRowY = tester.getCenter(find.text('Item 0')).dy;
+      expect(tester.getCenter(find.text('Item 1')).dy, equals(firstRowY));
+      expect(tester.getCenter(find.text('Item 2')).dy, equals(firstRowY));
+      expect(
+          tester.getCenter(find.text('Item 3')).dy, isNot(equals(firstRowY)));
+    });
+
+    testWidgets('flex_grid_delegate_respects_max_cross_axis_count',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1920, 1080));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ResponsiveFlexList.builder(
+            itemCount: 8,
+            gridDelegate: const ResponsiveFlexGridDelegate(
+              maxCrossAxisCount: 4,
+            ),
+            itemBuilder: (context, index) =>
+                SizedBox(height: 80, child: Text('Item $index')),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final firstRowY = tester.getCenter(find.text('Item 0')).dy;
+      expect(tester.getCenter(find.text('Item 1')).dy, equals(firstRowY));
+      expect(tester.getCenter(find.text('Item 2')).dy, equals(firstRowY));
+      expect(tester.getCenter(find.text('Item 3')).dy, equals(firstRowY));
+      expect(
+          tester.getCenter(find.text('Item 4')).dy, isNot(equals(firstRowY)));
+    });
+
     testWidgets('masonry_grid_delegate_controls_column_boundaries',
         (tester) async {
       await tester.binding.setSurfaceSize(const Size(320, 600));
@@ -1424,7 +1479,7 @@ void main() {
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
             itemCount: 3,
-            gridDelegate: const ResponsiveFlexGridDelegate(
+            gridDelegate: const ResponsiveMasonryGridDelegate(
               minCrossAxisCount: 3,
             ),
             itemBuilder: (context, index) => SizedBox(
@@ -1442,15 +1497,15 @@ void main() {
       expect(tester.getTopLeft(find.text('Item 2')).dy, equals(firstRowY));
     });
 
-    testWidgets('masonry_grid_delegate_ignores_fixed_item_sizing',
+    testWidgets('masonry_grid_delegate_respects_custom_spacing',
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ResponsiveFlexMasonry.pinterest(
             itemCount: 1,
-            gridDelegate: const ResponsiveFlexGridDelegate(
-              childAspectRatio: 1,
-              mainAxisExtent: 100,
+            gridDelegate: const ResponsiveMasonryGridDelegate(
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 15,
             ),
             itemBuilder: (context, index) => const SizedBox(
               height: 80,
@@ -1614,6 +1669,520 @@ void main() {
 
       await tester.pumpAndSettle();
       expect(find.text('No items to display'), findsOneWidget);
+    });
+  });
+
+  // ============================================
+  // GROUP 11: Main Axis Spacing Verification
+  // ============================================
+  group('mainAxisSpacing only between items/rows and not after last line', () {
+    testWidgets(
+        'builder constructor does not add mainAxisSpacing after the last row',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      const double mainAxisSpacing = 20.0;
+      const double itemHeight = 100.0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ResponsiveFlexList.builder(
+                shrinkWrap: true,
+                crossAxisCount: 1,
+                mainAxisSpacing: mainAxisSpacing,
+                itemCount: 2,
+                itemBuilder: (context, index) => SizedBox(
+                  key: ValueKey('builder_item_$index'),
+                  height: itemHeight,
+                  child: Text('Item $index'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final item0Rect =
+          tester.getRect(find.byKey(const ValueKey('builder_item_0')));
+      final item1Rect =
+          tester.getRect(find.byKey(const ValueKey('builder_item_1')));
+
+      // Distance between item 0 bottom and item 1 top should equal mainAxisSpacing
+      expect(item1Rect.top - item0Rect.bottom, equals(mainAxisSpacing));
+
+      // Parent height of the list should equal: 2 * itemHeight + 1 * mainAxisSpacing (no trailing spacing)
+      final flexListFinder = find.byType(ResponsiveFlexList);
+      final flexListSize = tester.getSize(flexListFinder);
+      expect(flexListSize.height, equals(2 * itemHeight + mainAxisSpacing));
+    });
+
+    testWidgets(
+        'default constructor (children) does not add mainAxisSpacing after the last row',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      const double mainAxisSpacing = 25.0;
+      const double itemHeight = 100.0;
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ResponsiveFlexList(
+                shrinkWrap: true,
+                crossAxisCount: 1,
+                mainAxisSpacing: mainAxisSpacing,
+                children: [
+                  SizedBox(
+                    key: ValueKey('child_0'),
+                    height: itemHeight,
+                    child: Text('Child 0'),
+                  ),
+                  SizedBox(
+                    key: ValueKey('child_1'),
+                    height: itemHeight,
+                    child: Text('Child 1'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final child0Rect = tester.getRect(find.byKey(const ValueKey('child_0')));
+      final child1Rect = tester.getRect(find.byKey(const ValueKey('child_1')));
+
+      expect(child1Rect.top - child0Rect.bottom, equals(mainAxisSpacing));
+
+      final flexListFinder = find.byType(ResponsiveFlexList);
+      final flexListSize = tester.getSize(flexListFinder);
+      expect(flexListSize.height, equals(2 * itemHeight + mainAxisSpacing));
+    });
+
+    testWidgets(
+        'instagram layout does not add mainAxisSpacing after the last row',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(300, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      const double mainAxisSpacing = 15.0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ResponsiveFlexMasonry.instagram(
+                shrinkWrap: true,
+                crossAxisCount: 3,
+                mainAxisSpacing: mainAxisSpacing,
+                itemCount: 6, // 2 rows of 3 columns
+                itemBuilder: (context, index) => Container(
+                  key: ValueKey('insta_$index'),
+                  child: Text('Insta $index'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final flexListFinder = find.byType(ResponsiveFlexList);
+      final flexListRect = tester.getRect(flexListFinder);
+
+      // The last row items' bottom should match the flex list bottom (no trailing margin)
+      final item5Rect = tester.getRect(find.byKey(const ValueKey('insta_5')));
+      expect(flexListRect.bottom, equals(item5Rect.bottom));
+    });
+  });
+
+  // ============================================
+  // GROUP 12: Grid Item Sizing (childAspectRatio & mainAxisExtent)
+  // ============================================
+  group('Grid item sizing (childAspectRatio and mainAxisExtent)', () {
+    testWidgets('1. Child with no explicit size + childAspectRatio',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      // 600 width, crossAxisCount: 2 -> column width = 300
+      // childAspectRatio: 2 -> height = 300 / 2 = 150
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList(
+              gridDelegate: const ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                childAspectRatio: 2,
+              ),
+              children: [
+                Container(
+                  key: const ValueKey('item_0'),
+                  color: Colors.red,
+                  child: const Text('No size'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(150));
+    });
+
+    testWidgets('2. Child with explicit height + childAspectRatio',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      // Child specifies height: 500, but delegate specifies childAspectRatio: 2
+      // Geometry must be 300 x 150
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList(
+              gridDelegate: ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                childAspectRatio: 2,
+              ),
+              children: [
+                SizedBox(
+                  key: ValueKey('item_0'),
+                  height: 500,
+                  child: Text('Explicit Height 500'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(150));
+    });
+
+    testWidgets('3. Child with explicit width + childAspectRatio',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      // Child specifies width: 500, but delegate specifies crossAxisCount: 2 (300) and childAspectRatio: 2 (150)
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList(
+              gridDelegate: ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                childAspectRatio: 2,
+              ),
+              children: [
+                SizedBox(
+                  key: ValueKey('item_0'),
+                  width: 500,
+                  child: Text('Explicit Width 500'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(150));
+    });
+
+    testWidgets('4. Child with explicit height + mainAxisExtent',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      // Child specifies height: 100, but mainAxisExtent: 250
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList(
+              gridDelegate: ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                mainAxisExtent: 250,
+              ),
+              children: [
+                SizedBox(
+                  key: ValueKey('item_0'),
+                  height: 100,
+                  child: Text('Explicit Height 100'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(250));
+    });
+
+    testWidgets('5. Child with explicit width + mainAxisExtent',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      // Child specifies width: 500, mainAxisExtent: 250
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList(
+              gridDelegate: ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                mainAxisExtent: 250,
+              ),
+              children: [
+                SizedBox(
+                  key: ValueKey('item_0'),
+                  width: 500,
+                  child: Text('Explicit Width 500'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(250));
+    });
+
+    testWidgets('6. mainAxisExtent without childAspectRatio', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList.builder(
+              gridDelegate: const ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                mainAxisExtent: 180,
+              ),
+              itemCount: 2,
+              itemBuilder: (context, index) => Container(
+                key: ValueKey('item_$index'),
+                child: Text('Item $index'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(180));
+    });
+
+    testWidgets('7. childAspectRatio without mainAxisExtent', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList.builder(
+              gridDelegate: const ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                childAspectRatio: 1.5,
+              ),
+              itemCount: 2,
+              itemBuilder: (context, index) => Container(
+                key: ValueKey('item_$index'),
+                child: Text('Item $index'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(200)); // 300 / 1.5 = 200
+    });
+
+    testWidgets('8. Both provided must fail assertion', (tester) async {
+      expect(
+        () => ResponsiveFlexGridDelegate(
+          childAspectRatio: 1.0,
+          mainAxisExtent: 200.0,
+        ),
+        throwsAssertionError,
+      );
+
+      expect(
+        () => const ResponsiveFlexList(
+          childAspectRatio: 1.0,
+          mainAxisExtent: 200.0,
+          children: [Text('Fail')],
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    testWidgets('9. Neither provided preserves existing default behavior',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList(
+              gridDelegate: ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+              ),
+              children: [
+                SizedBox(
+                  key: ValueKey('item_0'),
+                  height: 120,
+                  child: Text('Natural size'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('item_0')));
+      expect(itemSize.width, equals(300));
+      expect(itemSize.height, equals(120));
+    });
+
+    testWidgets('10. Vertical layout sizing verification across builders',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList.withSeparators(
+              gridDelegate: const ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                mainAxisExtent: 140,
+              ),
+              itemCount: 2,
+              itemBuilder: (context, index) => SizedBox(
+                key: ValueKey('sep_item_$index'),
+                height: 500, // Explicit child height overridden
+                child: Text('Item $index'),
+              ),
+              mainAxisSeparator: (index, count) => const Divider(),
+              crossAxisSeparator: (index, count) => const VerticalDivider(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('sep_item_0')));
+      expect(itemSize.width, equals(200));
+      expect(itemSize.height, equals(140));
+    });
+
+    testWidgets('11. RTL layout sizing verification', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList(
+              rtlOptions: RTLOptions(forceTextDirection: TextDirection.rtl),
+              gridDelegate: ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                childAspectRatio: 2,
+              ),
+              children: [
+                SizedBox(
+                  key: ValueKey('rtl_item_0'),
+                  height: 300,
+                  child: Text('RTL Item'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('rtl_item_0')));
+      expect(itemSize.width, equals(200));
+      expect(itemSize.height, equals(100)); // 200 / 2 = 100
+    });
+
+    testWidgets(
+        '12. Verification across children, builder, and roundRobinLayout',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ResponsiveFlexList.withSeparators(
+              roundRobinLayout: true,
+              gridDelegate: const ResponsiveFlexGridDelegate(
+                crossAxisCount: 2,
+                crossAxisSpacing: 0,
+                mainAxisExtent: 160,
+              ),
+              itemCount: 2,
+              itemBuilder: (context, index) => SizedBox(
+                key: ValueKey('rr_item_$index'),
+                height: 400,
+                child: Text('RR Item $index'),
+              ),
+              mainAxisSeparator: (index, count) => const SizedBox.shrink(),
+              crossAxisSeparator: (index, count) => const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final itemSize = tester.getSize(find.byKey(const ValueKey('rr_item_0')));
+      expect(itemSize.width, equals(200));
+      expect(itemSize.height, equals(160));
     });
   });
 }
